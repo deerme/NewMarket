@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mockito="http://www.mockito.org/spring/mockito"
+       xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.mockito.org/spring/mockito http://www.mockito.org/spring/mockito.xsd">
+
+    <!-- Enable Annotation based Declarative Transaction Management -->
+    <tx:annotation-driven proxy-target-class="true"
+                          transaction-manager="transactionManager" />
+
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <jdbc:embedded-database id="dataSource" type="H2" >
+        <jdbc:script location="classpath:schema.sql" />
+        <jdbc:script location="classpath:data.sql" />
+    </jdbc:embedded-database>
+
+    <bean id="testExecutionManager" class="service.ExecutionManager">
+        <property name="executionDAO" ref="testExecutionDao"/>
+    </bean>
+
+    <bean id="testOrderManager" class="service.OrderManager">
+        <property name="executionManager" ref="testExecutionManager"/>
+        <property name="orderDAO" ref="testOrderDao"/>
+    </bean>
+
+    <bean id="testOrderDao" class="database.OrderDAOImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <mockito:spy beanName="testOrderDao" />
+
+    <bean id="testExecutionDao" class="database.ExecutionDAOImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+</beans>
