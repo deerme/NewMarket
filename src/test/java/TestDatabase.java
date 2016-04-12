@@ -3,17 +3,11 @@ import beanTestConfiguration.BeanTestConfiguration;
 import database.OrderDAOImpl;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.TestAnnotationUtils;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestContextBootstrapper;
-import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -29,7 +23,6 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = BeanTestConfiguration.class, loader = AnnotationConfigContextLoader.class)
-//@ComponentScan(basePackages = "classpath:/beanTestConfiguration")
 public class TestDatabase {
     @Autowired
     private DataSource datasource;
@@ -41,10 +34,7 @@ public class TestDatabase {
 
     @Before
     public void initJdbcTemplate(){
-       // TestAnnotationUtils testAnnotationUtils = new TestAnnotationUtils(BeanTestConfiguration.class);
-       // AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(BeanTestConfiguration.class);
-        //TestContextManager testContextManager = new TestContextManager((TestContextBootstrapper) annotationConfigApplicationContext);
-         jdbcTemplate = new JdbcTemplate(datasource);
+        jdbcTemplate = new JdbcTemplate(datasource);
     }
 
     @Test
@@ -66,7 +56,7 @@ public class TestDatabase {
         orderManager.takeMessageWithOrder ("BUY 2000");
         assertEquals (rowsInOrderTableBeforeInsertion+1,JdbcTestUtils.countRowsInTable (jdbcTemplate,"orderinmarket"));
     }
-    @Ignore
+
     @Test
     public void testAddingTwoMatchingOrdersToDatabaseShouldAddNewExecutionToDatabase() throws JMSException {
         JdbcTestUtils.deleteFromTables (jdbcTemplate,"execution","orderinmarket");
@@ -74,7 +64,7 @@ public class TestDatabase {
         orderManager.takeMessageWithOrder ("SELL 200");
         assertEquals (1,JdbcTestUtils.countRowsInTable (jdbcTemplate,"execution"));
     }
-    @Ignore
+
     @Test
     public void testUpdatingTwoOrdersAfterAddingTwoMatchingOrdersToDatabaseAndMakingExecutionShouldUpdateTwoOrders() throws JMSException {
         JdbcTestUtils.deleteFromTables (jdbcTemplate,"execution","orderinmarket");
@@ -92,7 +82,7 @@ public class TestDatabase {
         assertEquals (QUANTITY_OF_BUY_ORDER_BEFORE_MATCHING_TO_SELL_ORDER-quantityOfExecution,quantityOfBuyOrderAfterUpdatingAfterDoneExecution);
         assertEquals (quantityOfSellOrderBeforeMatchingToBuyOrder-quantityOfExecution,quantityOfSellOrderAfterUpdatingAfterDoneExecution);
     }
-    @Ignore
+
     @Test
     public void testUpdatingTwoOrdersAfterAddingTwoMatchingOrdersToDatabaseAndMakingExecutionShouldUpdateTwoOrders2() throws JMSException {
         JdbcTestUtils.deleteFromTables (jdbcTemplate,"execution","orderinmarket");

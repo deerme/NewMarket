@@ -1,7 +1,10 @@
+
+import beanTestConfiguration.BeanTestConfigurationWithMocks;
 import database.OrderDAOImpl;
 import exceptions.ExceptionFromOrderDao;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -9,13 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import service.OrderManager;
-
 import javax.jms.JMSException;
 import javax.sql.DataSource;
 
-import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -23,7 +25,7 @@ import static org.junit.Assert.assertEquals;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:/testConfigurationForTransactions.xml")
+@ContextConfiguration(classes = BeanTestConfigurationWithMocks.class, loader = AnnotationConfigContextLoader.class)
 public class TestDatabaseTestTransactions {
     @Autowired
     private DataSource datasource;
@@ -37,7 +39,7 @@ public class TestDatabaseTestTransactions {
     public void initJdbcTemplate(){
          jdbcTemplate = new JdbcTemplate(datasource);
     }
-
+    @Ignore
     @Test
     public void testTransaction1() throws JMSException {
         Mockito.doThrow(new ExceptionFromOrderDao("exception from spy")).when(orderDAO).updateOrderToDatabase(Mockito.anyInt(), Mockito.anyInt());

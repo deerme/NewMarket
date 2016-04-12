@@ -41,22 +41,6 @@ public class Execution {
         this.quantityOfExecution = quantityOfExecution;
     }
 
-    public int getQuantityOfBuyer() {
-        return quantityOfBuyer;
-    }
-
-    public void setQuantityOfBuyer(int quantityOfBuyer) {
-        this.quantityOfBuyer = quantityOfBuyer;
-    }
-
-    public int getQuantityOfSeller() {
-        return quantityOfSeller;
-    }
-
-    public void setQuantityOfSeller(int quantityOfSeller) {
-        this.quantityOfSeller = quantityOfSeller;
-    }
-
     public void setId(int id) {
         this.id = id;
     }

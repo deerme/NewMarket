@@ -3,25 +3,30 @@ package beanTestConfiguration;
 import database.ExecutionDAOImpl;
 import database.OrderDAOImpl;
 import mq.Sender;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import service.ExecutionManager;
 import service.OrderManager;
+
 import javax.jms.JMSException;
 import javax.sql.DataSource;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import static org.mockito.Mockito.spy;
 
 
 /**
  * Created by pizmak on 2016-04-11.
  */
 @Configuration
-public class BeanTestConfiguration  {
+public class BeanTestConfigurationWithMocks {
 
         @Autowired
         private Environment env;
@@ -34,7 +39,7 @@ public class BeanTestConfiguration  {
 
         @Bean
         public OrderDAOImpl testOrderDAO(DataSource dataSource){
-            return new OrderDAOImpl(dataSource);
+            return (OrderDAOImpl) spy(new OrderDAOImpl(dataSource));
         }
 
         @Bean
@@ -66,5 +71,10 @@ public class BeanTestConfiguration  {
                     .addScript("data.sql")
                     .build();
             return db;
+        }
+
+        @Bean
+        public DataSourceTransactionManager dataSourceTransactionManager(DataSource dataSource){
+            return new DataSourceTransactionManager(dataSource);
         }
 }

@@ -27,22 +27,6 @@ public class Receiver implements ExceptionListener {
         this.serverName = serverName;
     }
 
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
-    }
-
-    public String getQueueName() {
-        return queueName;
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
-
     public void createConnection() throws JMSException {
         connectionFactory = new ActiveMQConnectionFactory(serverName);
         connection = connectionFactory.createConnection();

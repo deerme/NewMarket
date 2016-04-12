@@ -11,12 +11,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import service.ExecutionManager;
 import service.OrderManager;
 import service.OrderReader;
 import service.OrderReceiver;
 import javax.jms.JMSException;
+import javax.sql.DataSource;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
@@ -52,8 +54,8 @@ public class BeanConfiguration {
     }
 
     @Bean(initMethod = "initReceiver")
-    public OrderReceiver orderReceiver(Receiver receiver,ArrayBlockingQueue arrayBlockingQueue){
-        return new OrderReceiver(receiver,arrayBlockingQueue);
+    public OrderReceiver orderReceiver(Receiver receiver,ArrayBlockingQueue arrayBlockingQueue,DataSourceTransactionManager dataSourceTransactionManager){
+        return new OrderReceiver(receiver,arrayBlockingQueue,dataSourceTransactionManager);
     }
 
     @Bean
@@ -79,6 +81,11 @@ public class BeanConfiguration {
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public DataSourceTransactionManager dataSourceTransactionManager(DataSource dataSource){
+        return new DataSourceTransactionManager(dataSource);
     }
 
     @Bean

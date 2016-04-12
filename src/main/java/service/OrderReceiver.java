@@ -6,12 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
-
 import javax.jms.JMSException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -24,16 +21,18 @@ public class OrderReceiver implements Runnable {
     private Receiver receiver;
     private static final Logger logger = LoggerFactory.getLogger(OrderReceiver.class);
     private BlockingQueue blockingQueueWithOrders;
+    private PlatformTransactionManager transactionManager;
 
     // single TransactionTemplate shared amongst all methods in this instance
     private TransactionTemplate transactionTemplate;
 
-    public OrderReceiver(Receiver receiver, ArrayBlockingQueue arrayBlockingQueue) {
+    public OrderReceiver(Receiver receiver, ArrayBlockingQueue arrayBlockingQueue,PlatformTransactionManager transactionManager) {
         this.receiver = receiver;
         this.blockingQueueWithOrders = arrayBlockingQueue;
+        this.transactionManager = transactionManager;
     }
 
-    public void setTransactionTemplate(PlatformTransactionManager transactionManager){
+    public void setTransactionTemplate(){
         Assert.notNull(transactionManager, "The ''transactionManager'' argument must not be null.");
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
@@ -44,20 +43,11 @@ public class OrderReceiver implements Runnable {
                 try {
                     runReceiver ();
                 } catch (GeneralException e) {
-                    e.printStackTrace ();
+                    logger.error("Exception",e);
                 }
             }
         });
     }
-
-    public void setBlockingQueueWithOrders(BlockingQueue blockingQueueWithOrders) {
-        this.blockingQueueWithOrders = blockingQueueWithOrders;
-    }
-
-    public void setReceiver(Receiver receiver) {
-        this.receiver = receiver;
-    }
-
 
     public void run()  {
         logger.info("After init OrderReceiver");
@@ -96,6 +86,7 @@ public class OrderReceiver implements Runnable {
     }
 
     public void initReceiver(){
-        new Thread (this).start ();
+        setTransactionTemplate();
+       // new Thread (this).start ();
     }
 }

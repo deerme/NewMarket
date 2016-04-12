@@ -25,16 +25,8 @@ public class ExecutionManager {
         this.executionDAO = executionDAO;
     }
 
-    public ExecutionManager(ExecutionDAOImpl testExecutionDAO) {
-        this.executionDAO = testExecutionDAO;
-    }
-
     public void setExecutionDAO(ExecutionDAOImpl executionDAO) {
         this.executionDAO = executionDAO;
-    }
-
-    public void setSender(Sender sender) {
-        this.sender = sender;
     }
 
     public void createExecution(Order sellOrder, Order buyOrder) throws JMSException {

@@ -18,27 +18,8 @@ public class Sender {
     private MessageProducer messageProducer;
     private static final Logger logger = LoggerFactory.getLogger(Sender.class);
 
-    public Sender() {
-    }
-
     public Sender(String queueName,String serverName) throws JMSException {
         this.queueName = queueName;
-        this.serverName = serverName;
-    }
-
-    public String getQueueName() {
-        return queueName;
-    }
-
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    public void setServerName(String serverName) {
         this.serverName = serverName;
     }
 

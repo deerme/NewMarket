@@ -3,8 +3,6 @@ package service;
 import exception.GeneralException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
-
 import javax.jms.JMSException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -21,14 +19,6 @@ public class OrderReader implements Runnable{
     public OrderReader(OrderManager orderManager, ArrayBlockingQueue arrayBlockingQueue) {
         this.blockingQueueWithOrders = arrayBlockingQueue;
         this.orderManager = orderManager;
-    }
-
-    public void setOrderManager(OrderManager orderManager) {
-        this.orderManager = orderManager;
-    }
-
-    public void setBlockingQueueWithOrders(java.util.concurrent.ArrayBlockingQueue blockingQueueWithOrders) {
-        this.blockingQueueWithOrders = blockingQueueWithOrders;
     }
 
     public void run() {
