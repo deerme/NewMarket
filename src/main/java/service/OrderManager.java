@@ -1,5 +1,6 @@
 package service;
 
+import database.OrderDAO;
 import database.OrderDAOImpl;
 import model.Order;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -15,13 +16,13 @@ import java.util.Set;
  * Created by PBanasiak on 3/23/2016.
  */
 public class OrderManager {
-    private OrderDAOImpl orderDAO;
+    private OrderDAO orderDAO;
     private ExecutionManager executionManager;
 
     private static final Logger logger= LoggerFactory.getLogger (OrderManager.class);
     private static final Logger auditLogger = LoggerFactory.getLogger("auditLogger");
 
-    public OrderManager(ExecutionManager executionManager, OrderDAOImpl orderDAO) {
+    public OrderManager(ExecutionManager executionManager, OrderDAO orderDAO) {
         this.executionManager = executionManager;
         this.orderDAO = orderDAO;
     }

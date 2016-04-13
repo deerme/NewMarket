@@ -1,19 +1,29 @@
 package beanTestConfiguration;
 
+import database.ExecutionDAO;
 import database.ExecutionDAOImpl;
+import database.OrderDAO;
 import database.OrderDAOImpl;
+import mq.Receiver;
 import mq.Sender;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import service.ExecutionManager;
 import service.OrderManager;
+import service.OrderReader;
+import service.OrderReceiver;
 
 import javax.jms.JMSException;
 import javax.sql.DataSource;
@@ -26,42 +36,43 @@ import static org.mockito.Mockito.spy;
  * Created by pizmak on 2016-04-11.
  */
 @Configuration
+@EnableTransactionManagement
 public class BeanTestConfigurationWithMocks {
 
-        @Autowired
-        private Environment env;
-
-
+//        @Autowired
+//        private Environment env;
+//
+//
         @Bean
-        public ExecutionDAOImpl testExecutionDAO(DataSource dataSource){
-            return new ExecutionDAOImpl(dataSource);
+        public ExecutionDAO testExecutionDAO(){
+            return new ExecutionDAOImpl(dataSource());
         }
-
+//
         @Bean
-        public OrderDAOImpl testOrderDAO(DataSource dataSource){
-            return (OrderDAOImpl) spy(new OrderDAOImpl(dataSource));
+        public OrderDAO testOrderDAO(DataSource dataSource){
+            return spy(new OrderDAOImpl(dataSource));
         }
-
+//
         @Bean
-        public OrderManager testOrderManager(ExecutionManager testExecutionManager, OrderDAOImpl testOrderDAO){
-            return new OrderManager(testExecutionManager,testOrderDAO);
+        public OrderManager testOrderManager(){
+            return new OrderManager(testExecutionManager(), testOrderDAO(dataSource()));
         }
-
-        @Bean(initMethod = "initSender" ,destroyMethod="closeConnection")
-        public Sender testSender() throws JMSException {
-            return new Sender("testExecutionsInformationQueue","tcp://localhost:61616");
-        }
-
+//
         @Bean
-        public ArrayBlockingQueue testBlockingQueueWithOrders(){
-            return new ArrayBlockingQueue(1000);
+        public Sender testSender() {
+            return Mockito.mock(Sender.class);
         }
-
+//
+//        @Bean
+//        public ArrayBlockingQueue testBlockingQueueWithOrders(){
+//            return new ArrayBlockingQueue(1000);
+//        }
+//
         @Bean
-        ExecutionManager testExecutionManager(Sender testSender,ExecutionDAOImpl testExecutionDAO){
-            return new ExecutionManager(testSender,testExecutionDAO);
+        public ExecutionManager testExecutionManager(){
+            return new ExecutionManager(testSender(), testExecutionDAO());
         }
-
+//
         @Bean
         public DataSource dataSource() {
             EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
@@ -72,9 +83,31 @@ public class BeanTestConfigurationWithMocks {
                     .build();
             return db;
         }
-
-        @Bean
-        public DataSourceTransactionManager dataSourceTransactionManager(DataSource dataSource){
-            return new DataSourceTransactionManager(dataSource);
-        }
+//
+//
+//
+//    @Bean(initMethod = "initReceiver")
+//    public OrderReceiver testOrderReceiver(Receiver testReceiver, ArrayBlockingQueue testArrayBlockingQueue, DataSourceTransactionManager dataSourceTransactionManager){
+//        return new OrderReceiver(testReceiver,testArrayBlockingQueue,dataSourceTransactionManager);
+//    }
+//
+//    @Bean( destroyMethod="closeConnection")
+//    public Receiver testReceiver(){
+//        return new Receiver("testQueueWithNewOrders","tcp://localhost:61616");
+//    }
+//
+//    @Bean(initMethod = "initOrderReader")
+//    public OrderReader orderReader(OrderManager orderManager , ArrayBlockingQueue arrayBlockingQueue){
+//        return new OrderReader(orderManager,arrayBlockingQueue);
+//    }
+//
+//    @Bean
+//    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+//        return new PropertySourcesPlaceholderConfigurer();
+//    }
+//
+    @Bean
+    public DataSourceTransactionManager dataSourceTransactionManager(){
+        return new DataSourceTransactionManager(dataSource());
+    }
 }

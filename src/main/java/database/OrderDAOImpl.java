@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +24,14 @@ import java.util.List;
 /**
  * Created by PBanasiak on 3/21/2016.
  */
-@Transactional(readOnly = true)
+@Transactional
 public class OrderDAOImpl implements OrderDAO {
+    private final DataSource dataSource;
     private JdbcTemplate jdbcTemplate;
     private static final Logger logger = LoggerFactory.getLogger("auditLogger");
 
     public OrderDAOImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 

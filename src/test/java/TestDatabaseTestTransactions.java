@@ -1,7 +1,10 @@
 
 import beanTestConfiguration.BeanTestConfigurationWithMocks;
+import database.ExecutionDAO;
+import database.OrderDAO;
 import database.OrderDAOImpl;
 import exceptions.ExceptionFromOrderDao;
+import mq.Receiver;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -33,13 +36,15 @@ public class TestDatabaseTestTransactions {
     @Autowired
     private OrderManager orderManager;
     @Autowired
-    private OrderDAOImpl orderDAO;
+    private OrderDAO orderDAO;
+    @Autowired
+    private ExecutionDAO executionDAO;
 
     @Before
     public void initJdbcTemplate(){
-         jdbcTemplate = new JdbcTemplate(datasource);
+        jdbcTemplate = new JdbcTemplate(datasource);
     }
-    @Ignore
+
     @Test
     public void testTransaction1() throws JMSException {
         Mockito.doThrow(new ExceptionFromOrderDao("exception from spy")).when(orderDAO).updateOrderToDatabase(Mockito.anyInt(), Mockito.anyInt());

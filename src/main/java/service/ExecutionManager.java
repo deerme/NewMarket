@@ -1,5 +1,6 @@
 package service;
 
+import database.ExecutionDAO;
 import database.ExecutionDAOImpl;
 import model.Execution;
 import model.Order;
@@ -16,11 +17,11 @@ import javax.jms.JMSException;
  */
 public class ExecutionManager {
     private Sender sender;
-    private ExecutionDAOImpl executionDAO;
+    private ExecutionDAO executionDAO;
     private static final Logger logger = LoggerFactory.getLogger(ExecutionManager.class);
     private static final Logger auditLogger = LoggerFactory.getLogger("auditLogger");
 
-    public ExecutionManager(Sender sender, ExecutionDAOImpl executionDAO) {
+    public ExecutionManager(Sender sender, ExecutionDAO executionDAO) {
         this.sender = sender;
         this.executionDAO = executionDAO;
     }
