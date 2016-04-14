@@ -26,10 +26,8 @@ import java.util.List;
 //@PropertySource("classpath:/jdbc.properties")
 public class ExecutionDAOImpl implements ExecutionDAO {
     private JdbcTemplate jdbcTemplate;
-    private DataSource dataSource;
 
     public ExecutionDAOImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 

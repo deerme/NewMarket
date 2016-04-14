@@ -9,8 +9,6 @@ public class Execution {
     private int idBuyer;
     private int idSeller;
     private int quantityOfExecution;
-    private int quantityOfBuyer;
-    private int quantityOfSeller;
 
     public Execution(){
 
@@ -21,14 +19,8 @@ public class Execution {
         this.idSeller = idSeller;
     }
 
-    public Execution( int idBuyer, int idSeller, int quantityOfBuyer, int quantityOfSeller){
+    public Execution( int idBuyer, int idSeller,int id,int quantityOfExecution){
         this(idBuyer,idSeller);
-        this.quantityOfBuyer = quantityOfBuyer;
-        this.quantityOfSeller = quantityOfSeller;
-    }
-
-    public Execution( int idBuyer, int idSeller, int quantityOfBuyer, int quantityOfSeller,int id,int quantityOfExecution){
-        this(idBuyer,idSeller,quantityOfBuyer,quantityOfSeller);
         this.id = id;
         this.quantityOfExecution = quantityOfExecution;
     }

@@ -40,7 +40,8 @@ public class OrderReceiver implements Runnable {
     public void service() {
         transactionTemplate.execute (new TransactionCallbackWithoutResult () {
             protected void doInTransactionWithoutResult (TransactionStatus status) {
-                run ();
+                new Thread ().start ();
+
                 try {
                     runReceiver ();
                 } catch (GeneralException e) {
@@ -88,6 +89,5 @@ public class OrderReceiver implements Runnable {
 
     public void initReceiver(){
         setTransactionTemplate();
-       // new Thread (this).start ();
     }
 }

@@ -62,8 +62,8 @@ public class OrderManager {
 
     public void checkIfMatchesSellAndBuyOrders () throws JMSException {
         List<ImmutablePair<Order, Order>> listOfAllAvailablePairsOfOrders = orderDAO.getPairsOfMatchingOrders ();
-        Set<Integer> setOfAllUsedIdOfBuyer = new HashSet<Integer> ();
-        Set<Integer> setOfAllUsedIdOfSeller = new HashSet<Integer> ();
+        Set<Integer> setOfAllUsedIdOfBuyer = new HashSet<> ();
+        Set<Integer> setOfAllUsedIdOfSeller = new HashSet<> ();
 
         for (ImmutablePair<Order, Order> pairOfOrders : listOfAllAvailablePairsOfOrders) {
             Order sellOrder;
@@ -76,7 +76,6 @@ public class OrderManager {
                 setOfAllUsedIdOfSeller.add (sellOrder.getId ());
 
                 int quantityOfOrder = Math.min(sellOrder.getQuantity (),buyOrder.getQuantity ());
-
 
                 executionManager.createExecution (sellOrder, buyOrder);
                 orderDAO.updateOrderToDatabase (buyOrder.getId (), buyOrder.getQuantity() - quantityOfOrder);

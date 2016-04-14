@@ -15,7 +15,5 @@ import org.springframework.stereotype.Component;
 public class MainAnnotation {
 
     public static void main(String []args){
-        System.out.println("Hello");
-        //ApplicationContext context = new AnnotationConfigApplicationContext(BeanConfiguration.class);
     }
 }

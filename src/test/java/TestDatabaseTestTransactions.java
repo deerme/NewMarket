@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,6 +30,7 @@ import javax.sql.DataSource;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = BeanTestConfiguration.class, loader = AnnotationConfigContextLoader.class)
 public class TestDatabaseTestTransactions {
+    private static final Logger logger = LoggerFactory.getLogger(TestDatabaseTestTransactions.class);
     @Autowired
     private DataSource datasource;
     private JdbcTemplate jdbcTemplate;
@@ -56,6 +59,7 @@ public class TestDatabaseTestTransactions {
             orderManager.takeMessageWithOrder("SELL 80");
         } catch (ExceptionFromOrderDao ex) {
             Assert.assertEquals(new Integer(0), jdbcTemplate.queryForObject("select count(*) from execution", Integer.class));
+            logger.info("Thrown exeception by mock",ex,ex.getMessage());
         }
     }
 }

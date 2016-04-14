@@ -26,12 +26,10 @@ import java.util.List;
  */
 @Transactional
 public class OrderDAOImpl implements OrderDAO {
-    private final DataSource dataSource;
     private JdbcTemplate jdbcTemplate;
     private static final Logger logger = LoggerFactory.getLogger("auditLogger");
 
     public OrderDAOImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
