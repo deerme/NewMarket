@@ -34,6 +34,9 @@ public class TestDatabase {
     @Qualifier("testOrderDAO")
     private OrderDAOImpl orderDAO;
 
+    private static final String NAME_OF_TABLE_WITH_EXECUTIONS = "execution";
+    private static final String NAME_OF_TABLE_WITH_ORDERS = "orderinmarket";
+
     @Before
     public void initJdbcTemplate(){
         jdbcTemplate = new JdbcTemplate(datasource);
@@ -41,35 +44,35 @@ public class TestDatabase {
 
     @Test
     public void testDatabaseShouldReturnNoRows() throws JMSException {
-        JdbcTestUtils.deleteFromTables (jdbcTemplate,"execution","orderinmarket");
-        assertEquals (0,JdbcTestUtils.countRowsInTable (jdbcTemplate,"orderinmarket"));
+        JdbcTestUtils.deleteFromTables (jdbcTemplate,NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
+        assertEquals (0,JdbcTestUtils.countRowsInTable (jdbcTemplate,NAME_OF_TABLE_WITH_ORDERS));
     }
 
     @Test
     public void testInsertingOrderToDatabaseShouldReturnOneMoreRowFromOrderTable(){
-        int rowsInOrderTableBeforeInsertion = JdbcTestUtils.countRowsInTable (jdbcTemplate,"orderinmarket");
+        int rowsInOrderTableBeforeInsertion = JdbcTestUtils.countRowsInTable (jdbcTemplate,NAME_OF_TABLE_WITH_ORDERS);
         orderDAO.addOrderToDatabase ("BUY",300);
-        assertEquals (rowsInOrderTableBeforeInsertion+1,JdbcTestUtils.countRowsInTable (jdbcTemplate,"orderinmarket"));
+        assertEquals (rowsInOrderTableBeforeInsertion+1,JdbcTestUtils.countRowsInTable (jdbcTemplate,NAME_OF_TABLE_WITH_ORDERS));
     }
 
     @Test
     public void testInsertingOrderToatabaseFromStrinMessageShouldReturnOneMoreRowFromOrderTable() throws JMSException {
-        int rowsInOrderTableBeforeInsertion = JdbcTestUtils.countRowsInTable (jdbcTemplate,"orderinmarket");
+        int rowsInOrderTableBeforeInsertion = JdbcTestUtils.countRowsInTable (jdbcTemplate,NAME_OF_TABLE_WITH_ORDERS);
         orderManager.takeMessageWithOrder ("BUY 2000");
-        assertEquals (rowsInOrderTableBeforeInsertion+1,JdbcTestUtils.countRowsInTable (jdbcTemplate,"orderinmarket"));
+        assertEquals (rowsInOrderTableBeforeInsertion+1,JdbcTestUtils.countRowsInTable (jdbcTemplate,NAME_OF_TABLE_WITH_ORDERS));
     }
 
     @Test
     public void testAddingTwoMatchingOrdersToDatabaseShouldAddNewExecutionToDatabase() throws JMSException {
-        JdbcTestUtils.deleteFromTables (jdbcTemplate,"execution","orderinmarket");
+        JdbcTestUtils.deleteFromTables (jdbcTemplate,NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
         orderManager.takeMessageWithOrder ("BUY 200");
         orderManager.takeMessageWithOrder ("SELL 200");
-        assertEquals (1,JdbcTestUtils.countRowsInTable (jdbcTemplate,"execution"));
+        assertEquals (1,JdbcTestUtils.countRowsInTable (jdbcTemplate,NAME_OF_TABLE_WITH_EXECUTIONS));
     }
 
     @Test
     public void testUpdatingTwoOrdersAfterAddingTwoMatchingOrdersToDatabaseAndMakingExecutionShouldUpdateTwoOrders() throws JMSException {
-        JdbcTestUtils.deleteFromTables (jdbcTemplate,"execution","orderinmarket");
+        JdbcTestUtils.deleteFromTables (jdbcTemplate,NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
 
         final int QUANTITY_OF_BUY_ORDER_BEFORE_MATCHING_TO_SELL_ORDER=300;
         int quantityOfSellOrderBeforeMatchingToBuyOrder=400;
@@ -87,7 +90,7 @@ public class TestDatabase {
 
     @Test
     public void testUpdatingTwoOrdersAfterAddingTwoMatchingOrdersToDatabaseAndMakingExecutionShouldUpdateTwoOrders2() throws JMSException {
-        JdbcTestUtils.deleteFromTables (jdbcTemplate,"execution","orderinmarket");
+        JdbcTestUtils.deleteFromTables (jdbcTemplate,NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
 
         orderManager.takeMessageWithOrder("BUY 200");
         orderManager.takeMessageWithOrder("SELL 80");

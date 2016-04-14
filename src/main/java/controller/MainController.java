@@ -6,6 +6,7 @@ package controller;
 
 import database.ExecutionDAOImpl;
 import database.OrderDAOImpl;
+import exception.GeneralException;
 import model.Execution;
 import model.Order;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class MainController {
     }
 
     @RequestMapping( value = "/addNewOrder",method =  RequestMethod.POST)
-    public String addNewOrderToDatabase(@RequestParam("quantity") int quantityOfOrder, @RequestParam("typeOfOrder") String typeOfOrder, ModelMap model){
+    public String addNewOrderToDatabase(@RequestParam("quantity") int quantityOfOrder, @RequestParam("typeOfOrder") String typeOfOrder, ModelMap model) throws GeneralException {
         putNewOrderToArrayBlockingQueueWithOrders(typeOfOrder,quantityOfOrder);
 
         model.addAttribute("typeOfOrder",typeOfOrder);
@@ -71,11 +72,12 @@ public class MainController {
         return "afterAddedNewOrder";
     }
 
-    public void putNewOrderToArrayBlockingQueueWithOrders(String typeOfOrder,int quantityOfOrder){
+    public void putNewOrderToArrayBlockingQueueWithOrders(String typeOfOrder,int quantityOfOrder) throws GeneralException {
         try {
             arrayBlockingQueueWithOrders.put(typeOfOrder+" "+ quantityOfOrder);
         } catch (InterruptedException e) {
-            logger.error("Couldn`t add new order", e);
+            logger.error("Couldn`t add new order"+e.getMessage(),e);
+            throw new GeneralException(e);
         }
     }
 }

@@ -42,6 +42,9 @@ public class TestDatabaseTestTransactions {
     @Autowired
     private ExecutionDAO executionDAO;
 
+    private static final String NAME_OF_TABLE_WITH_EXECUTIONS = "execution";
+    private static final String NAME_OF_TABLE_WITH_ORDERS = "orderinmarket";
+
     @Before
     public void initJdbcTemplate(){
         jdbcTemplate = new JdbcTemplate(datasource);
@@ -51,7 +54,7 @@ public class TestDatabaseTestTransactions {
     public void testTransaction1() throws JMSException {
         Mockito.doThrow(new ExceptionFromOrderDao("exception from spy")).when(orderDAO).updateOrderToDatabase(Mockito.anyInt(), Mockito.anyInt());
 
-        JdbcTestUtils.deleteFromTables (jdbcTemplate,"execution","orderinmarket");
+        JdbcTestUtils.deleteFromTables (jdbcTemplate,NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
 
         try {
             orderManager.takeMessageWithOrder("BUY 200");

@@ -65,7 +65,8 @@ public class OrderReceiver implements Runnable {
         try {
             receiver.createConnection();
         } catch (JMSException e) {
-            e.printStackTrace();
+            logger.error("Exception"+e.getMessage(),e);
+            throw new GeneralException(e);
         }
         while (true) {
             logger.info ("In threadloop");
