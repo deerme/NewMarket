@@ -1,17 +1,15 @@
 
-import beanTestConfiguration.BeanTestConfigurationWithMocks;
+import beanTestConfiguration.BeanTestConfiguration;
 import database.ExecutionDAO;
 import database.OrderDAO;
-import database.OrderDAOImpl;
 import exceptions.ExceptionFromOrderDao;
-import mq.Receiver;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -28,7 +26,7 @@ import javax.sql.DataSource;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = BeanTestConfigurationWithMocks.class, loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = BeanTestConfiguration.class, loader = AnnotationConfigContextLoader.class)
 public class TestDatabaseTestTransactions {
     @Autowired
     private DataSource datasource;
@@ -36,6 +34,7 @@ public class TestDatabaseTestTransactions {
     @Autowired
     private OrderManager orderManager;
     @Autowired
+    @Qualifier("mockTestOrderDAO")
     private OrderDAO orderDAO;
     @Autowired
     private ExecutionDAO executionDAO;
@@ -54,8 +53,9 @@ public class TestDatabaseTestTransactions {
         try {
             orderManager.takeMessageWithOrder("BUY 200");
             orderManager.takeMessageWithOrder("SELL 80");
+            orderManager.takeMessageWithOrder("SELL 80");
         } catch (ExceptionFromOrderDao ex) {
-            Assert.assertEquals(new Integer(0), jdbcTemplate.queryForObject("select count(1) from execution", Integer.class));
+            Assert.assertEquals(new Integer(0), jdbcTemplate.queryForObject("select count(*) from execution", Integer.class));
         }
     }
 }

@@ -32,10 +32,11 @@ public class OrderReceiver implements Runnable {
         this.transactionManager = transactionManager;
     }
 
-    public void setTransactionTemplate(){
-        Assert.notNull(transactionManager, "The ''transactionManager'' argument must not be null.");
-        this.transactionTemplate = new TransactionTemplate(transactionManager);
+    public void setTransactionTemplate () {
+            Assert.notNull(transactionManager, "The ''transactionManager'' argument must not be null.");
+            this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
+
     public void service() {
         transactionTemplate.execute (new TransactionCallbackWithoutResult () {
             protected void doInTransactionWithoutResult (TransactionStatus status) {

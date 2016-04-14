@@ -3,10 +3,12 @@ package beanTestConfiguration;
 import database.ExecutionDAOImpl;
 import database.OrderDAOImpl;
 import mq.Sender;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -15,6 +17,8 @@ import service.OrderManager;
 import javax.jms.JMSException;
 import javax.sql.DataSource;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import static org.mockito.Mockito.spy;
 
 
 /**
@@ -28,23 +32,28 @@ public class BeanTestConfiguration  {
 
 
         @Bean
-        public ExecutionDAOImpl testExecutionDAO(DataSource dataSource){
-            return new ExecutionDAOImpl(dataSource);
+        public ExecutionDAOImpl testExecutionDAO(){
+            return new ExecutionDAOImpl(dataSource());
         }
 
         @Bean
-        public OrderDAOImpl testOrderDAO(DataSource dataSource){
-            return new OrderDAOImpl(dataSource);
+        public OrderDAOImpl testOrderDAO(){
+            return new OrderDAOImpl(dataSource());
         }
 
         @Bean
-        public OrderManager testOrderManager(ExecutionManager testExecutionManager, OrderDAOImpl testOrderDAO){
-            return new OrderManager(testExecutionManager,testOrderDAO);
+        public OrderDAOImpl mockTestOrderDAO(){
+            return spy(new OrderDAOImpl(dataSource()));
         }
 
-        @Bean(initMethod = "initSender" ,destroyMethod="closeConnection")
+        @Bean
+        public OrderManager testOrderManager() throws JMSException {
+            return new OrderManager(testExecutionManager(),testOrderDAO());
+        }
+
+        @Bean
         public Sender testSender() throws JMSException {
-            return new Sender("testExecutionsInformationQueue","tcp://localhost:61616");
+            return Mockito.mock(Sender.class);
         }
 
         @Bean
@@ -53,8 +62,8 @@ public class BeanTestConfiguration  {
         }
 
         @Bean
-        ExecutionManager testExecutionManager(Sender testSender,ExecutionDAOImpl testExecutionDAO){
-            return new ExecutionManager(testSender,testExecutionDAO);
+        ExecutionManager testExecutionManager() throws JMSException {
+            return new ExecutionManager(testSender(),testExecutionDAO());
         }
 
         @Bean
@@ -66,5 +75,10 @@ public class BeanTestConfiguration  {
                     .addScript("data.sql")
                     .build();
             return db;
+        }
+
+        @Bean
+        public DataSourceTransactionManager dataSourceTransactionManager(){
+            return new DataSourceTransactionManager(dataSource());
         }
 }
