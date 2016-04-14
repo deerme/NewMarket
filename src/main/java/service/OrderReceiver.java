@@ -51,6 +51,7 @@ public class OrderReceiver implements Runnable {
         });
     }
 
+    @Override
     public void run()  {
         logger.info("After init OrderReceiver");
         try {

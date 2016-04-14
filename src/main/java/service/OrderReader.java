@@ -21,6 +21,7 @@ public class OrderReader implements Runnable{
         this.orderManager = orderManager;
     }
 
+    @Override
     public void run() {
         logger.info("After init OrderReader");
 

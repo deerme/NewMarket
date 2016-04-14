@@ -74,7 +74,7 @@ public class OrderDAOImpl implements OrderDAO {
                         sellOrder.setType(rs.getString("typeSell"));
                         sellOrder.setId(rs.getInt("idSell"));
                         sellOrder.setQuantity(rs.getInt("quantitySell"));
-                        ImmutablePair<Order,Order> pairOfMatchedExecutions = new ImmutablePair<Order, Order> (buyOrder,sellOrder);
+                        ImmutablePair<Order,Order> pairOfMatchedExecutions = new ImmutablePair<> (buyOrder,sellOrder);
 
                         return pairOfMatchedExecutions;
                     }

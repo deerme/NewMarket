@@ -9,7 +9,6 @@ import javax.sql.DataSource;
  * Created by PBanasiak on 3/21/2016.
  */
 public class TableCreator {
-    private static final Logger logger= LoggerFactory.getLogger(TableCreator.class);
     private JdbcTemplate jdbcTemplate;
 
     public void setDataSource(DataSource dataSource) {
