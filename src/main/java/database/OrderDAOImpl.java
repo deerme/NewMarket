@@ -28,13 +28,13 @@ public class OrderDAOImpl implements OrderDAO {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public KeyHolder addOrderToDatabase(final String typeOfOrder, final int quantity) {
-        final String INSERT_SQL = "INSERT INTO ORDERINMARKET(TYPE,QUANTITY) VALUES(?,?);";
+        final String insertSql = "INSERT INTO ORDERINMARKET(TYPE,QUANTITY) VALUES(?,?);";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         this.jdbcTemplate.update(
                 connection -> {
                     PreparedStatement ps =
-                            connection.prepareStatement(INSERT_SQL);
+                            connection.prepareStatement(insertSql);
                     ps.setString(1, typeOfOrder);
                     ps.setInt(2,quantity);
 
@@ -64,9 +64,8 @@ public class OrderDAOImpl implements OrderDAO {
                     sellOrder.setType(rs.getString("typeSell"));
                     sellOrder.setId(rs.getInt("idSell"));
                     sellOrder.setQuantity(rs.getInt("quantitySell"));
-                    ImmutablePair<Order,Order> pairOfMatchedExecutions = new ImmutablePair<> (buyOrder,sellOrder);
 
-                    return pairOfMatchedExecutions;
+                    return new ImmutablePair<Order, Order>(buyOrder,sellOrder);
                 });
         return listOfAllAvailablePairsOfOrders;
     }

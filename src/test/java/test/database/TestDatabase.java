@@ -75,17 +75,17 @@ public class TestDatabase {
     public void testUpdatingTwoOrdersAfterAddingTwoMatchingOrdersToDatabaseAndMakingExecutionShouldUpdateTwoOrders() throws JMSException {
         JdbcTestUtils.deleteFromTables (jdbcTemplate,NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
 
-        final int QUANTITY_OF_BUY_ORDER_BEFORE_MATCHING_TO_SELL_ORDER=300;
+        final int quantityOfBuyOrderBeforeMatchingToSellOrder=300;
         int quantityOfSellOrderBeforeMatchingToBuyOrder=400;
-        int idOfBuyOrder = orderDAO.addOrderToDatabase ("BUY" , QUANTITY_OF_BUY_ORDER_BEFORE_MATCHING_TO_SELL_ORDER).getKey ().intValue ();
+        int idOfBuyOrder = orderDAO.addOrderToDatabase ("BUY" , quantityOfBuyOrderBeforeMatchingToSellOrder).getKey ().intValue ();
         int idOfSellOrder = orderDAO.addOrderToDatabase ("SELL" , quantityOfSellOrderBeforeMatchingToBuyOrder).getKey ().intValue ();
         orderManager.checkIfMatchesSellAndBuyOrders ();
-        int quantityOfExecution = Math.min (QUANTITY_OF_BUY_ORDER_BEFORE_MATCHING_TO_SELL_ORDER,quantityOfSellOrderBeforeMatchingToBuyOrder);
+        int quantityOfExecution = Math.min (quantityOfBuyOrderBeforeMatchingToSellOrder,quantityOfSellOrderBeforeMatchingToBuyOrder);
 
         int quantityOfBuyOrderAfterUpdatingAfterDoneExecution = this.jdbcTemplate.queryForObject("select quantity from orderinmarket where id = ?", Integer.class, idOfBuyOrder);
         int quantityOfSellOrderAfterUpdatingAfterDoneExecution = this.jdbcTemplate.queryForObject("select quantity from orderinmarket where id = ?", Integer.class, idOfSellOrder);
 
-        assertEquals (QUANTITY_OF_BUY_ORDER_BEFORE_MATCHING_TO_SELL_ORDER-quantityOfExecution,quantityOfBuyOrderAfterUpdatingAfterDoneExecution);
+        assertEquals (quantityOfBuyOrderBeforeMatchingToSellOrder-quantityOfExecution,quantityOfBuyOrderAfterUpdatingAfterDoneExecution);
         assertEquals (quantityOfSellOrderBeforeMatchingToBuyOrder-quantityOfExecution,quantityOfSellOrderAfterUpdatingAfterDoneExecution);
     }
 
