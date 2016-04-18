@@ -1,4 +1,4 @@
-package testDatabase;
+package test.database;
 
 import bean.test.configuration.BeanTestConfiguration;
 import database.ExecutionDAO;

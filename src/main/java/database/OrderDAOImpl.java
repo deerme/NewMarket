@@ -5,19 +5,12 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 
@@ -86,8 +79,6 @@ public class OrderDAOImpl implements OrderDAO {
                     order.setId(rs.getInt("id"));
                     order.setQuantity(rs.getInt("quantity"));
 
-
-                    Order order2 = new Order(rs.getInt("id"),rs.getString("type"),rs.getInt("quantity"));
                     return order;
                 });
         return listOfAllOrders;

@@ -19,9 +19,6 @@ public class Receiver implements ExceptionListener {
     private MessageConsumer consumer;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public Receiver() {
-    }
-
     public Receiver(String queueName, String serverName) {
         this.queueName = queueName;
         this.serverName = serverName;
@@ -74,6 +71,6 @@ public class Receiver implements ExceptionListener {
     }
 
     public void onException(JMSException e) {
-
+        logger.error("JMSException",e);
     }
 }
