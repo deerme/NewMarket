@@ -1,4 +1,4 @@
-package beanConfig;
+package bean.configuration;
 
 import database.ExecutionDAOImpl;
 import database.OrderDAOImpl;

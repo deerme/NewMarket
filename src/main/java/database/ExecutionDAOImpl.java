@@ -1,17 +1,13 @@
 package database;
 
 import model.Execution;
-import model.Order;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +19,6 @@ import java.util.List;
  * Created by PBanasiak on 3/21/2016.
  */
 @Transactional
-//@PropertySource("classpath:/jdbc.properties")
 public class ExecutionDAOImpl implements ExecutionDAO {
     private JdbcTemplate jdbcTemplate;
 
@@ -37,16 +32,14 @@ public class ExecutionDAOImpl implements ExecutionDAO {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         this.jdbcTemplate.update(
-                new PreparedStatementCreator() {
-                    public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                        PreparedStatement ps =
-                                connection.prepareStatement(sqlInsertExecutionToDatabase);
-                        ps.setInt(1, quantity);
-                        ps.setInt(2, idSeller);
-                        ps.setInt(3, idBuyer);
+                connection -> {
+                    PreparedStatement ps =
+                            connection.prepareStatement(sqlInsertExecutionToDatabase);
+                    ps.setInt(1, quantity);
+                    ps.setInt(2, idSeller);
+                    ps.setInt(3, idBuyer);
 
-                        return ps;
-                    }
+                    return ps;
                 },
                 keyHolder);
         return keyHolder;
@@ -54,16 +47,14 @@ public class ExecutionDAOImpl implements ExecutionDAO {
 
     public List<Execution> getAllExecutions(){
         List<Execution> listOfAllExecutions = this.jdbcTemplate.query("SELECT * FROM EXECUTION",
-                new RowMapper<Execution>() {
-                    public Execution mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        Execution execution = new Execution();
-                        execution.setIdBuyer(rs.getInt("id_order_buyer"));
-                        execution.setIdSeller(rs.getInt("id_order_seller"));
-                        execution.setId(rs.getInt("id"));
-                        execution.setQuantityOfExecution(rs.getInt("quantity"));
+                (rs, rowNum) -> {
+                    Execution execution = new Execution();
+                    execution.setIdBuyer(rs.getInt("id_order_buyer"));
+                    execution.setIdSeller(rs.getInt("id_order_seller"));
+                    execution.setId(rs.getInt("id"));
+                    execution.setQuantityOfExecution(rs.getInt("quantity"));
 
-                        return execution;
-                    }
+                    return execution;
                 });
         return listOfAllExecutions;
     }

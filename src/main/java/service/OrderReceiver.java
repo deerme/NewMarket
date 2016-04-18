@@ -45,7 +45,7 @@ public class OrderReceiver implements Runnable {
                 try {
                     runReceiver ();
                 } catch (GeneralException e) {
-                    logger.error("Exception",e);
+                    logger.error("Exception ",e);
                 }
             }
         });
@@ -57,7 +57,7 @@ public class OrderReceiver implements Runnable {
         try {
             runReceiver();
         } catch (GeneralException e) {
-           logger.error("Exception"+e);
+           logger.error("Exception in method run"+e);
         }
     }
 

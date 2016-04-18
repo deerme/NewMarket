@@ -1,5 +1,6 @@
+package testDatabase;
 
-import beanTestConfiguration.BeanTestConfiguration;
+import bean.test.configuration.BeanTestConfiguration;
 import database.ExecutionDAO;
 import database.OrderDAO;
 import exceptions.ExceptionFromOrderDao;

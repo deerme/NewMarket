@@ -1,5 +1,6 @@
+package testDatabase;
 
-import beanTestConfiguration.BeanTestConfiguration;
+import bean.test.configuration.BeanTestConfiguration;
 import database.OrderDAOImpl;
 import org.junit.Assert;
 import org.junit.Before;

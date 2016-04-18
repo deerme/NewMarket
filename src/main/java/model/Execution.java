@@ -11,7 +11,7 @@ public class Execution {
     private int quantityOfExecution;
 
     public Execution(){
-
+        //  /*  It is necessary in ExecutionDAO implementation  */
     }
 
     public Execution( int idBuyer, int idSeller){

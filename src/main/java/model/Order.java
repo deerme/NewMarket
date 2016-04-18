@@ -12,7 +12,7 @@ public class Order {
     private int quantity;
 
     public Order(){
-
+         //  /*  It is necessary in OrderDAO implementation  */
     }
 
     public Order(int id,String type,int quantity){

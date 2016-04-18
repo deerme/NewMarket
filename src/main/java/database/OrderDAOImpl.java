@@ -39,15 +39,13 @@ public class OrderDAOImpl implements OrderDAO {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         this.jdbcTemplate.update(
-                new PreparedStatementCreator() {
-                    public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                        PreparedStatement ps =
-                                connection.prepareStatement(INSERT_SQL);
-                        ps.setString(1, typeOfOrder);
-                        ps.setInt(2,quantity);
+                connection -> {
+                    PreparedStatement ps =
+                            connection.prepareStatement(INSERT_SQL);
+                    ps.setString(1, typeOfOrder);
+                    ps.setInt(2,quantity);
 
-                        return ps;
-                    }
+                    return ps;
                 },
                 keyHolder);
         return keyHolder;
@@ -63,37 +61,34 @@ public class OrderDAOImpl implements OrderDAO {
         final String sqlGetPairsOfMatchingOrders = "SELECT p1.id as idSell , p1.type as typeSell , p1.quantity quantitySell, p2.id as idBuy , p2.type as typeBuy , p2.quantity as quantityBuy FROM orderinmarket p1 JOIN orderinmarket  p2 ON (p1.type  != p2.type)WHERE (p1.type='SELL' AND p2.type='BUY' AND p1.quantity>0 AND p2.quantity>0);";
 
         List<ImmutablePair<Order,Order>> listOfAllAvailablePairsOfOrders = this.jdbcTemplate.query(sqlGetPairsOfMatchingOrders,
-                new RowMapper<ImmutablePair<Order, Order>> () {
-                    public ImmutablePair<Order, Order> mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        Order buyOrder = new Order();
-                        Order sellOrder = new Order();
-                        buyOrder.setType(rs.getString("typeBuy"));
-                        buyOrder.setId(rs.getInt("idBuy"));
-                        buyOrder.setQuantity(rs.getInt("quantityBuy"));
+                (rs, rowNum) -> {
+                    Order buyOrder = new Order();
+                    Order sellOrder = new Order();
+                    buyOrder.setType(rs.getString("typeBuy"));
+                    buyOrder.setId(rs.getInt("idBuy"));
+                    buyOrder.setQuantity(rs.getInt("quantityBuy"));
 
-                        sellOrder.setType(rs.getString("typeSell"));
-                        sellOrder.setId(rs.getInt("idSell"));
-                        sellOrder.setQuantity(rs.getInt("quantitySell"));
-                        ImmutablePair<Order,Order> pairOfMatchedExecutions = new ImmutablePair<> (buyOrder,sellOrder);
+                    sellOrder.setType(rs.getString("typeSell"));
+                    sellOrder.setId(rs.getInt("idSell"));
+                    sellOrder.setQuantity(rs.getInt("quantitySell"));
+                    ImmutablePair<Order,Order> pairOfMatchedExecutions = new ImmutablePair<> (buyOrder,sellOrder);
 
-                        return pairOfMatchedExecutions;
-                    }
-
+                    return pairOfMatchedExecutions;
                 });
         return listOfAllAvailablePairsOfOrders;
     }
 
     public List<Order> getAllOrders(){
         List<Order> listOfAllOrders = this.jdbcTemplate.query("SELECT * FROM ORDERINMARKET",
-                new RowMapper<Order> () {
-                    public Order mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        Order order = new Order();
-                        order.setType(rs.getString("type"));
-                        order.setId(rs.getInt("id"));
-                        order.setQuantity(rs.getInt("quantity"));
+                (rs, rowNum) -> {
+                    Order order = new Order();
+                    order.setType(rs.getString("type"));
+                    order.setId(rs.getInt("id"));
+                    order.setQuantity(rs.getInt("quantity"));
 
-                        return order;
-                    }
+
+                    Order order2 = new Order(rs.getInt("id"),rs.getString("type"),rs.getInt("quantity"));
+                    return order;
                 });
         return listOfAllOrders;
     }

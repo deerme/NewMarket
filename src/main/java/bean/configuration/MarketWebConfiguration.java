@@ -1,4 +1,4 @@
-package beanConfig;
+package bean.configuration;
 
 import controller.MainController;
 import database.ExecutionDAOImpl;

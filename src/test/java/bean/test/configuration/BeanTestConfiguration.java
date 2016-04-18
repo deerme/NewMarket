@@ -1,4 +1,4 @@
-package beanTestConfiguration;
+package bean.test.configuration;
 
 import database.ExecutionDAOImpl;
 import database.OrderDAOImpl;
