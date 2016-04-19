@@ -71,11 +71,10 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     public List<Order> getAllOrders(){
-        List<Order> listOfAllOrders = this.jdbcTemplate.query("SELECT * FROM ORDERINMARKET",
+        return this.jdbcTemplate.query("SELECT * FROM ORDERINMARKET",
                 (rs, rowNum) -> {
                     return new Order(rs.getInt("id"),rs.getString("type"),rs.getInt("quantity"));
                 });
-        return listOfAllOrders;
     }
 }
 

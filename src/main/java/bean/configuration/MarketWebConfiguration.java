@@ -18,7 +18,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
     @Configuration
     @EnableWebMvc
-    @ComponentScan(basePackages = {"beanConfig","controller"})
+    @ComponentScan(basePackages = {"bean.configuration","controller"})
     public class MarketWebConfiguration {
 
         @Bean
