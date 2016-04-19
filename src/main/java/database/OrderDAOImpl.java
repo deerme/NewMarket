@@ -65,7 +65,7 @@ public class OrderDAOImpl implements OrderDAO {
                     sellOrder.setId(rs.getInt("idSell"));
                     sellOrder.setQuantity(rs.getInt("quantitySell"));
 
-                    return new ImmutablePair<Order, Order>(buyOrder,sellOrder);
+                    return new ImmutablePair< >(buyOrder,sellOrder);
                 });
         return listOfAllAvailablePairsOfOrders;
     }
@@ -73,12 +73,7 @@ public class OrderDAOImpl implements OrderDAO {
     public List<Order> getAllOrders(){
         List<Order> listOfAllOrders = this.jdbcTemplate.query("SELECT * FROM ORDERINMARKET",
                 (rs, rowNum) -> {
-                    Order order = new Order();
-                    order.setType(rs.getString("type"));
-                    order.setId(rs.getInt("id"));
-                    order.setQuantity(rs.getInt("quantity"));
-
-                    return order;
+                    return new Order(rs.getInt("id"),rs.getString("type"),rs.getInt("quantity"));
                 });
         return listOfAllOrders;
     }

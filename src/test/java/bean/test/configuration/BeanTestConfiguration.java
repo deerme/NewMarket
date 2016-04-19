@@ -71,12 +71,8 @@ public class BeanTestConfiguration  {
         @Bean
         public DataSource dataSource() {
             EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-            EmbeddedDatabase db = builder
-                    .setType(EmbeddedDatabaseType.H2)
-                    .addScript("schema.sql")
-                    .addScript("data.sql")
-                    .build();
-            return db;
+
+            return builder.setType(EmbeddedDatabaseType.H2).addScript("schema.sql").addScript("data.sql").build();
         }
 
         @Bean
