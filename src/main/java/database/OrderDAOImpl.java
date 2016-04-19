@@ -54,27 +54,13 @@ public class OrderDAOImpl implements OrderDAO {
         final String sqlGetPairsOfMatchingOrders = "SELECT p1.id as idSell , p1.type as typeSell , p1.quantity quantitySell, p2.id as idBuy , p2.type as typeBuy , p2.quantity as quantityBuy FROM orderinmarket p1 JOIN orderinmarket  p2 ON (p1.type  != p2.type)WHERE (p1.type='SELL' AND p2.type='BUY' AND p1.quantity>0 AND p2.quantity>0);";
 
         List<ImmutablePair<Order,Order>> listOfAllAvailablePairsOfOrders = this.jdbcTemplate.query(sqlGetPairsOfMatchingOrders,
-                (rs, rowNum) -> {
-                    Order buyOrder = new Order();
-                    Order sellOrder = new Order();
-                    buyOrder.setType(rs.getString("typeBuy"));
-                    buyOrder.setId(rs.getInt("idBuy"));
-                    buyOrder.setQuantity(rs.getInt("quantityBuy"));
-
-                    sellOrder.setType(rs.getString("typeSell"));
-                    sellOrder.setId(rs.getInt("idSell"));
-                    sellOrder.setQuantity(rs.getInt("quantitySell"));
-
-                    return new ImmutablePair< >(buyOrder,sellOrder);
-                });
+                (rs, rowNum) -> new ImmutablePair< >(new Order(rs.getInt("idBuy"),rs.getString("typeBuy"),rs.getInt("quantityBuy")),new Order(rs.getInt("idSell"),rs.getString("typeSell"),rs.getInt("quantitySell"))));
         return listOfAllAvailablePairsOfOrders;
     }
 
     public List<Order> getAllOrders(){
         return this.jdbcTemplate.query("SELECT * FROM ORDERINMARKET",
-                (rs, rowNum) -> {
-                    return new Order(rs.getInt("id"),rs.getString("type"),rs.getInt("quantity"));
-                });
+                (rs, rowNum) -> new Order(rs.getInt("id"),rs.getString("type"),rs.getInt("quantity")));
     }
 }
 

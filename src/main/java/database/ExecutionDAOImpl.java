@@ -42,8 +42,6 @@ public class ExecutionDAOImpl implements ExecutionDAO {
 
     public List<Execution> getAllExecutions(){
         return  this.jdbcTemplate.query("SELECT * FROM EXECUTION",
-                (rs, rowNum) -> {
-                    return new Execution(rs.getInt("id_order_buyer"),rs.getInt("id_order_seller"),rs.getInt("id"),rs.getInt("quantity"));
-                });
+                (rs, rowNum) -> new Execution(rs.getInt("id_order_buyer"),rs.getInt("id_order_seller"),rs.getInt("id"),rs.getInt("quantity")));
     }
 }
