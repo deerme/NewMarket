@@ -30,18 +30,20 @@ public class OrderReader implements Runnable{
                 getMessageFromQueueAndSendIntoOrderManager ();
             } catch (GeneralException e) {
                 logger.error("GeneralExeception:"+e);
+            } catch (InterruptedException e) {
+                logger.error("GeneralExeception:"+e);
             }
         }
     }
 
-    public void getMessageFromQueueAndSendIntoOrderManager() throws GeneralException {
+    public void getMessageFromQueueAndSendIntoOrderManager() throws GeneralException,InterruptedException {
         try {
             String orderMessage = (String) blockingQueueWithOrders.take();
             logger.info("Message from queue:"+orderMessage);
             sendMessageWithOrderToExecutionManager(orderMessage);
         } catch (InterruptedException e) {
             logger.error ("GeneralException: " + e.getMessage (), e);
-            throw new GeneralException (e);
+            throw /*new GeneralException (*/e/*)*/;
         } catch (JMSException e) {
             logger.error("JMSEcveption"+ e.getMessage (), e);
             throw new GeneralException (e);
