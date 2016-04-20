@@ -28,11 +28,11 @@ public class OrderReader implements Runnable{
         while(true){
             try {
                 getMessageFromQueueAndSendIntoOrderManager ();
-            } catch (GeneralException e) {
+            }/* catch (GeneralException e) {
                 logger.error("GeneralExeception:"+e);
-            } catch (InterruptedException e) {
+            }*/ catch (InterruptedException e) {
                 logger.error("GeneralExeception:"+e);
-                return;
+                throw new GeneralException(e);
             }
         }
     }
