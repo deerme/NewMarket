@@ -32,7 +32,7 @@ public class OrderReader implements Runnable{
                 logger.error("GeneralExeception:"+e);
             }*/ catch (InterruptedException e) {
                 logger.error("GeneralExeception:"+e);
-                throw new GeneralException(e);
+                Thread.currentThread().interrupt();
             }
         }
     }

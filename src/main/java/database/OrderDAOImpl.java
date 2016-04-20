@@ -53,8 +53,21 @@ public class OrderDAOImpl implements OrderDAO {
     public List<ImmutablePair<Order,Order>> getPairsOfMatchingOrders(){
         final String sqlGetPairsOfMatchingOrders = "SELECT p1.id as idSell , p1.type as typeSell , p1.quantity quantitySell, p2.id as idBuy , p2.type as typeBuy , p2.quantity as quantityBuy FROM orderinmarket p1 JOIN orderinmarket  p2 ON (p1.type  != p2.type)WHERE (p1.type='SELL' AND p2.type='BUY' AND p1.quantity>0 AND p2.quantity>0);";
 
-        return this.jdbcTemplate.query(sqlGetPairsOfMatchingOrders,
-                (rs, rowNum) -> new ImmutablePair< >(new Order(rs.getInt("idBuy"),rs.getString("typeBuy"),rs.getInt("quantityBuy")),new Order(rs.getInt("idSell"),rs.getString("typeSell"),rs.getInt("quantitySell"))));
+        return this.jdbcTemplate.query(
+                sqlGetPairsOfMatchingOrders,
+                (rs, rowNum) -> new ImmutablePair<>(
+                        new Order(
+                                rs.getInt("idBuy"),
+                                rs.getString("typeBuy"),
+                                rs.getInt("quantityBuy")
+                        ),
+                        new Order(
+                                rs.getInt("idSell"),
+                                rs.getString("typeSell"),
+                                rs.getInt("quantitySell")
+                        )
+                )
+        );
     }
 
     public List<Order> getAllOrders(){
