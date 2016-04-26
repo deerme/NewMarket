@@ -19,4 +19,5 @@ public interface OrderDAO {
     public void updateOrderToDatabase(int idOrder,int quantity);
     @Transactional(propagation = Propagation.REQUIRED)
     public List<ImmutablePair<Order,Order>> getPairsOfMatchingOrders();
+    public List<Order> getAllOrders();
 }

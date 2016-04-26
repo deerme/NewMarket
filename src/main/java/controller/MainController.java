@@ -4,13 +4,16 @@ package controller;
  * Created by pizmak on 2016-04-07.
  */
 
-import database.ExecutionDAOImpl;
-import database.OrderDAOImpl;
+import database.ExecutionDAO;
+import database.OrderDAO;
 import exception.GeneralException;
 import model.Execution;
 import model.Order;
+import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,12 +26,15 @@ import java.util.concurrent.ArrayBlockingQueue;
 @Controller
 @RequestMapping("/")
 public class MainController {
-    private OrderDAOImpl orderDAO;
-    private ExecutionDAOImpl executionDAO;
+    private OrderDAO orderDAO;
+    private ExecutionDAO executionDAO;
     private ArrayBlockingQueue arrayBlockingQueueWithOrders;
-    private static final Logger logger= LoggerFactory.getLogger (MainController.class);
+    @Autowired
+    private CamelContext camelContext;
+    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
+    private ProducerTemplate producerTemplate;
 
-    public MainController(OrderDAOImpl orderDAO,ExecutionDAOImpl executionDAO,ArrayBlockingQueue blockingQueueWithOrders) {
+    public MainController(OrderDAO orderDAO, ExecutionDAO executionDAO, ArrayBlockingQueue blockingQueueWithOrders) {
         this.orderDAO = orderDAO;
         this.executionDAO = executionDAO;
         this.arrayBlockingQueueWithOrders = blockingQueueWithOrders;
@@ -62,22 +68,23 @@ public class MainController {
         return "addOrder";
     }
 
-    @RequestMapping( value = "/addNewOrder",method =  RequestMethod.POST)
+    @RequestMapping(value = "/addNewOrder", method = RequestMethod.POST)
     public String addNewOrderToDatabase(@RequestParam("quantity") int quantityOfOrder, @RequestParam("typeOfOrder") String typeOfOrder, ModelMap model) throws GeneralException {
-        putNewOrderToArrayBlockingQueueWithOrders(typeOfOrder,quantityOfOrder);
+        putNewOrderToArrayBlockingQueueWithOrders(typeOfOrder, quantityOfOrder);
 
-        model.addAttribute("typeOfOrder",typeOfOrder);
-        model.addAttribute("quantityOfOrder",quantityOfOrder);
+        model.addAttribute("typeOfOrder", typeOfOrder);
+        model.addAttribute("quantityOfOrder", quantityOfOrder);
 
         return "afterAddedNewOrder";
     }
 
-    public void putNewOrderToArrayBlockingQueueWithOrders(String typeOfOrder,int quantityOfOrder) throws GeneralException {
-        try {
-            arrayBlockingQueueWithOrders.put(typeOfOrder+" "+ quantityOfOrder);
-        } catch (InterruptedException e) {
-            logger.error("Couldn`t add new order"+e.getMessage(),e);
-            throw new GeneralException(e);
-        }
+    public void putNewOrderToArrayBlockingQueueWithOrders(String typeOfOrder, int quantityOfOrder) {
+        logger.info("Before sending by producerTemplate");
+        producerTemplate.requestBody("direct:mainRoute", typeOfOrder + " " + quantityOfOrder);
+        logger.info("After sending by producerTemplate");
+    }
+
+    public void createProducerTemplateFromCamelContext(){
+        this.producerTemplate = camelContext.createProducerTemplate();
     }
 }

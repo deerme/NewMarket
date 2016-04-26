@@ -1,35 +1,70 @@
 package bean.configuration;
 
+import camel.MainLogger;
+import camel.OrderProcessor;
+import camel.ServerConfig;
+import controller.MainController;
 import database.ExecutionDAOImpl;
+import database.OrderDAO;
 import database.OrderDAOImpl;
 import mq.Receiver;
 import mq.Sender;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
 import service.ExecutionManager;
 import service.OrderManager;
 import service.OrderReader;
 import service.OrderReceiver;
 import javax.jms.JMSException;
-import javax.sql.DataSource;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by pizmak on 2016-04-06.
  */
+@EnableWebMvc
 @Configuration
 @PropertySource("classpath:/jdbc.properties")
-//@Lazy
+@ComponentScan(basePackages = "camel")
+@Import(ServerConfig.class)
 public class BeanConfiguration {
     @Autowired
     private Environment env;
+
+    @Bean
+    public ViewResolver viewResolver() {
+        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+        viewResolver.setViewClass(JstlView.class);
+        viewResolver.setPrefix("/WEB-INF/views/");
+        viewResolver.setSuffix(".jsp");
+
+        return viewResolver;
+    }
+
+    @Bean(initMethod = "createProducerTemplateFromCamelContext")
+    public MainController mainController() throws Exception {
+        return new MainController(orderDAO(),executionDAO(),blockingQueueWithOrders());
+    }
+
+    @Bean
+    public MarketWebAppInitializer marketInitializer(){
+        return new MarketWebAppInitializer();
+    }
+
+    @Bean
+    OrderProcessor orderProcessor(){return new OrderProcessor(blockingQueueWithOrders());}
+
+    @Bean
+    MainLogger mainLogger(){
+        return new MainLogger();
+    }
 
     @Lazy
     @Bean( destroyMethod="closeConnection")
@@ -44,18 +79,18 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public ExecutionDAOImpl executionDAO(DriverManagerDataSource dataSource){
-        return new ExecutionDAOImpl(dataSource);
+    public ExecutionDAOImpl executionDAO(){
+        return new ExecutionDAOImpl(dataSource());
     }
 
     @Bean
-    public OrderDAOImpl orderDAO(DriverManagerDataSource dataSource){
-        return new OrderDAOImpl(dataSource);
+    public OrderDAO orderDAO(){
+        return new OrderDAOImpl(dataSource());
     }
 
     @Bean(initMethod = "initReceiver")
-    public OrderReceiver orderReceiver(Receiver receiver,ArrayBlockingQueue arrayBlockingQueue,DataSourceTransactionManager dataSourceTransactionManager){
-        return new OrderReceiver(receiver,arrayBlockingQueue,dataSourceTransactionManager);
+    public OrderReceiver orderReceiver(){
+        return new OrderReceiver(receiver(), blockingQueueWithOrders(),dataSourceTransactionManager());
     }
 
     @Bean
@@ -64,18 +99,18 @@ public class BeanConfiguration {
     }
 
     @Bean(initMethod = "initOrderReader")
-    public OrderReader orderReader(OrderManager orderManager , ArrayBlockingQueue arrayBlockingQueue){
-        return new OrderReader(orderManager,arrayBlockingQueue);
+    public OrderReader orderReader() throws JMSException {
+        return new OrderReader(orderManager(), blockingQueueWithOrders());
     }
 
     @Bean
-    public OrderManager orderManager(ExecutionManager executionManager, OrderDAOImpl orderDAO){
-        return new OrderManager(executionManager,orderDAO);
+    public OrderManager orderManager() throws JMSException {
+        return new OrderManager(executionManager(),orderDAO());
     }
 
     @Bean
-    ExecutionManager executionManager(Sender sender,ExecutionDAOImpl executionDAO){
-        return new ExecutionManager(sender,executionDAO);
+    ExecutionManager executionManager() throws JMSException {
+        return new ExecutionManager(sender(),executionDAO());
     }
 
     @Bean
@@ -84,8 +119,8 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public DataSourceTransactionManager dataSourceTransactionManager(DataSource dataSource){
-        return new DataSourceTransactionManager(dataSource);
+    public DataSourceTransactionManager dataSourceTransactionManager(){
+        return new DataSourceTransactionManager(dataSource());
     }
 
     @Bean

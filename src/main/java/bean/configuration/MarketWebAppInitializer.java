@@ -14,7 +14,7 @@ public class MarketWebAppInitializer implements WebApplicationInitializer {
 
     public void onStartup(ServletContext container) throws ServletException {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.register(MarketWebConfiguration.class);
+        context.register(BeanConfiguration.class);
         context.setServletContext(container);
 
         ServletRegistration.Dynamic servlet = container.addServlet("dispatcher", new DispatcherServlet(context));
