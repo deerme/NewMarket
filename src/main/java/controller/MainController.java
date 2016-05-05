@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 
 
 @Controller
@@ -28,16 +27,15 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class MainController {
     private OrderDAO orderDAO;
     private ExecutionDAO executionDAO;
-    private ArrayBlockingQueue arrayBlockingQueueWithOrders;
+
     @Autowired
     private CamelContext camelContext;
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
     private ProducerTemplate producerTemplate;
 
-    public MainController(OrderDAO orderDAO, ExecutionDAO executionDAO, ArrayBlockingQueue blockingQueueWithOrders) {
+    public MainController(OrderDAO orderDAO, ExecutionDAO executionDAO) {
         this.orderDAO = orderDAO;
         this.executionDAO = executionDAO;
-        this.arrayBlockingQueueWithOrders = blockingQueueWithOrders;
     }
 
     @RequestMapping(method = RequestMethod.GET)

@@ -12,7 +12,6 @@ public class MainLogger {
 
     @Handler
     public void logMessage(String message){
-        System.out.println("---------------------------------------------------------MainLogger"+message);
         logger.info("Camel info"+message);
     }
 }
