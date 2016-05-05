@@ -4,7 +4,6 @@ import database.ExecutionDAO;
 import database.ExecutionDAOImpl;
 import model.Execution;
 import model.Order;
-import mq.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.KeyHolder;
@@ -15,13 +14,11 @@ import javax.jms.JMSException;
  * Created by PBanasiak on 3/24/2016.
  */
 public class ExecutionManager {
-    private Sender sender;
     private ExecutionDAO executionDAO;
     private static final Logger logger = LoggerFactory.getLogger(ExecutionManager.class);
     private static final Logger auditLogger = LoggerFactory.getLogger("auditLogger");
 
-    public ExecutionManager(Sender sender, ExecutionDAO executionDAO) {
-        this.sender = sender;
+    public ExecutionManager(ExecutionDAO executionDAO) {
         this.executionDAO = executionDAO;
     }
 
@@ -37,7 +34,7 @@ public class ExecutionManager {
     }
 
     public void createMessage(Execution execution) throws JMSException {
-        sender.sendMessage("exec_id"+execution.getId()+"sell_id"+execution.getIdSeller()+"buy_id"+execution.getIdBuyer()+"qty"+execution.getQuantityOfExecution());
+        //sender.sendMessage("exec_id"+execution.getId()+"sell_id"+execution.getIdSeller()+"buy_id"+execution.getIdBuyer()+"qty"+execution.getQuantityOfExecution());
         logger.debug ("sended message to queue"+"exec_id"+execution.getId()+"sell_id"+execution.getIdSeller()+"buy_id+"+execution.getIdBuyer()+"qty"+execution.getQuantityOfExecution());
     }
 }

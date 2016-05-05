@@ -6,7 +6,6 @@ import controller.MainController;
 import database.ExecutionDAOImpl;
 import database.OrderDAO;
 import database.OrderDAOImpl;
-import mq.Sender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -61,14 +60,9 @@ public class BeanConfiguration {
         return new MainLogger();
     }
 
+    @Bean
     public OrderReader orderReader() throws JMSException {
         return new OrderReader(orderManager());
-    }
-
-    @Lazy
-    @Bean(initMethod = "initSender" ,destroyMethod="closeConnection")
-    public Sender sender() throws JMSException {
-        return new Sender(env.getProperty("jdbc.executionqueueName"),env.getProperty("jdbc.serverName"));
     }
 
     @Bean
@@ -88,7 +82,7 @@ public class BeanConfiguration {
 
     @Bean
     ExecutionManager executionManager() throws JMSException {
-        return new ExecutionManager(sender(),executionDAO());
+        return new ExecutionManager(executionDAO());
     }
 
     @Bean

@@ -19,13 +19,8 @@ import javax.jms.ConnectionFactory;
 @Configuration
 @ComponentScan(basePackages = "bean.configuration")
 public class ServerConfig  extends CamelConfiguration {
-
-    //-------Why I can`t autowired this bean?
-//    @Autowired
-//    private OrderReader orderReader;
-
     @Autowired
-    private OrderManager orderManager;
+    private OrderReader orderReader;
 
     @Bean
     RouteBuilder routeBuilder(){
@@ -35,7 +30,7 @@ public class ServerConfig  extends CamelConfiguration {
                 from("direct:mainRoute")
                         .transacted()
                         .bean(MainLogger.class)
-                        .bean(orderManager,"takeMessageWithOrder");
+                        .bean(orderReader);
 
                 from("jms:testQueueWithNewOrders")
                         .errorHandler(deadLetterChannel("jms:testQueueWithNewOrders.Dead").useOriginalMessage())
