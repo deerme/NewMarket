@@ -2,9 +2,13 @@ package service;
 
 import database.OrderDAO;
 import model.Order;
+import org.apache.camel.EndpointInject;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.annotation.Transactional;
 import javax.jms.JMSException;
@@ -19,6 +23,11 @@ import java.util.Set;
 public class OrderManager {
     private OrderDAO orderDAO;
     private ExecutionManager executionManager;
+
+
+    //@EndpointInject(uri="jms:dead")
+    @Produce(uri="jms:dead")
+    private ProducerTemplate producerTemplate;
 
     private static final Logger logger= LoggerFactory.getLogger (OrderManager.class);
     private static final Logger auditLogger = LoggerFactory.getLogger("auditLogger");
@@ -39,7 +48,7 @@ public class OrderManager {
 
         for (int i = 0; i < splittedMessage.length; i += 2) {
             logger.info ("Splitted message with order" + splittedMessage[i] + "  " + splittedMessage[i + 1]);
-
+            producerTemplate.sendBody("jms:dead","In order manager");
             Order order = new Order ();
             order.setType (splittedMessage[i]);
             order.setQuantity (Integer.valueOf (splittedMessage[i + 1]));

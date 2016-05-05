@@ -32,7 +32,7 @@ import javax.sql.DataSource;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = BeanTestConfiguration.class, loader = AnnotationConfigContextLoader.class)
 public class TestDatabaseTestTransactions {
-//    private static final Logger logger = LoggerFactory.getLogger(TestDatabaseTestTransactions.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestDatabaseTestTransactions.class);
 //    @Autowired
 //    private DataSource datasource;
 //    private JdbcTemplate jdbcTemplate;

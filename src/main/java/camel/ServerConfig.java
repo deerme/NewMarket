@@ -22,6 +22,7 @@ public class ServerConfig  extends CamelConfiguration {
     @Autowired
     private OrderReader orderReader;
 
+
     @Bean
     RouteBuilder routeBuilder(){
         return new RouteBuilder() {

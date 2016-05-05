@@ -6,6 +6,8 @@ import controller.MainController;
 import database.ExecutionDAOImpl;
 import database.OrderDAO;
 import database.OrderDAOImpl;
+import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -34,6 +36,14 @@ public class BeanConfiguration {
     @Autowired
     private Environment env;
 
+    @Autowired
+    private CamelContext camelContext;
+
+    @Bean
+    public ProducerTemplate producerTemplate(){
+        return camelContext.createProducerTemplate();
+    }
+
 
     @Bean
     public ViewResolver viewResolver() {
@@ -45,7 +55,7 @@ public class BeanConfiguration {
         return viewResolver;
     }
 
-    @Bean(initMethod = "createProducerTemplateFromCamelContext")
+    //@Bean(initMethod = "createProducerTemplateFromCamelContext")
     public MainController mainController() throws Exception {
         return new MainController(orderDAO(),executionDAO());
     }
