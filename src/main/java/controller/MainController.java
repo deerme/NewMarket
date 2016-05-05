@@ -70,7 +70,7 @@ public class MainController {
 
     @RequestMapping(value = "/addNewOrder", method = RequestMethod.POST)
     public String addNewOrderToDatabase(@RequestParam("quantity") int quantityOfOrder, @RequestParam("typeOfOrder") String typeOfOrder, ModelMap model) throws GeneralException {
-        putNewOrderToArrayBlockingQueueWithOrders(typeOfOrder, quantityOfOrder);
+        putNewOrderToQueueWithWaitingOrders(typeOfOrder, quantityOfOrder);
 
         model.addAttribute("typeOfOrder", typeOfOrder);
         model.addAttribute("quantityOfOrder", quantityOfOrder);
@@ -78,10 +78,10 @@ public class MainController {
         return "afterAddedNewOrder";
     }
 
-    public void putNewOrderToArrayBlockingQueueWithOrders(String typeOfOrder, int quantityOfOrder) {
-        logger.info("Before sending by producerTemplate");
-        producerTemplate.requestBody("direct:mainRoute", typeOfOrder + " " + quantityOfOrder);
-        logger.info("After sending by producerTemplate");
+    public void putNewOrderToQueueWithWaitingOrders(String typeOfOrder, int quantityOfOrder) {
+        logger.info("Before sending to testQueueWithNewOrders by producerTemplate");
+        producerTemplate.requestBody("jms:testQueueWithNewOrders", typeOfOrder + " " + quantityOfOrder);
+        logger.info("After sending to testQueueWithNewOrders by producerTemplate");
     }
 
     public void createProducerTemplateFromCamelContext(){
