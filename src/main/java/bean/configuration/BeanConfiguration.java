@@ -27,11 +27,11 @@ import javax.jms.JMSException;
  * Created by pizmak on 2016-04-06.
  */
 
-@EnableWebMvc
+//@EnableWebMvc
 @Configuration
 @PropertySource("classpath:/jdbc.properties")
-@ComponentScan(basePackages = "camel")
-@Import(ServerConfig.class)
+//@ComponentScan(basePackages = "camel")
+//@Import(ServerConfig.class)
 public class BeanConfiguration {
     @Autowired
     private Environment env;
@@ -56,14 +56,14 @@ public class BeanConfiguration {
     }
 
     //@Bean(initMethod = "createProducerTemplateFromCamelContext")
-    public MainController mainController() throws Exception {
-        return new MainController(orderDAO(),executionDAO());
-    }
+//    public MainController mainController() throws Exception {
+//        return new MainController(orderDAO(),executionDAO());
+//    }
 
-    @Bean
-    public MarketWebAppInitializer marketInitializer(){
-        return new MarketWebAppInitializer();
-    }
+//    @Bean
+//    public MarketWebAppInitializer marketInitializer(){
+//        return new MarketWebAppInitializer();
+//    }
 
     @Bean
     MainLogger mainLogger(){
@@ -91,7 +91,7 @@ public class BeanConfiguration {
     }
 
     @Bean
-    ExecutionManager executionManager() throws JMSException {
+    public ExecutionManager executionManager() throws JMSException {
         return new ExecutionManager(executionDAO());
     }
 

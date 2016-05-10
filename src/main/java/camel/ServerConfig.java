@@ -17,14 +17,13 @@ import javax.jms.ConnectionFactory;
  * Created by pizmak on 2016-04-21.
  */
 @Configuration
-@ComponentScan(basePackages = "bean.configuration")
-public class ServerConfig  extends CamelConfiguration {
+//@ComponentScan(basePackages = "bean.configuration")
+public class ServerConfig extends CamelConfiguration {
     @Autowired
     private OrderReader orderReader;
 
-
     @Bean
-    RouteBuilder routeBuilder(){
+    public RouteBuilder routeBuilder(){
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
@@ -34,6 +33,7 @@ public class ServerConfig  extends CamelConfiguration {
                         .bean(orderReader);
 
                 from("jms:testQueueWithNewOrders")
+                        .routeId("testQueueWithNewOrders")
                         .errorHandler(deadLetterChannel("jms:testQueueWithNewOrders.Dead").useOriginalMessage())
                         .bean(MainLogger.class)
                         .to("direct:mainRoute");
@@ -43,7 +43,7 @@ public class ServerConfig  extends CamelConfiguration {
     }
 
     @Bean
-    ConnectionFactory connectionFactory(){
+    public ConnectionFactory connectionFactory(){
      return new ActiveMQConnectionFactory("tcp://localhost:61616");
     }
 }
