@@ -10,7 +10,6 @@ import exception.GeneralException;
 import model.Execution;
 import model.Order;
 import org.apache.camel.CamelContext;
-import org.apache.camel.EndpointInject;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +28,10 @@ public class MainController {
     private OrderDAO orderDAO;
     private ExecutionDAO executionDAO;
 
-   // @Autowired
-   // private CamelContext camelContext;
+    @Autowired
+    private CamelContext camelContext;
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
-    //@EndpointInject(uri="jms:dead")
-   // @Autowired
-   private ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
 
     public MainController(OrderDAO orderDAO, ExecutionDAO executionDAO) {
         this.orderDAO = orderDAO;
@@ -85,7 +82,7 @@ public class MainController {
         logger.info("After sending to testQueueWithNewOrders by producerTemplate");
     }
 
-//    public void createProducerTemplateFromCamelContext(){
-//        this.producerTemplate = camelContext.createProducerTemplate();
-//    }
+    public void createProducerTemplateFromCamelContext(){
+        this.producerTemplate = camelContext.createProducerTemplate();
+    }
 }

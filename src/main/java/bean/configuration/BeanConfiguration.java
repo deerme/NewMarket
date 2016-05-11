@@ -6,8 +6,6 @@ import controller.MainController;
 import database.ExecutionDAOImpl;
 import database.OrderDAO;
 import database.OrderDAOImpl;
-import org.apache.camel.CamelContext;
-import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -18,9 +16,7 @@ import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
-import service.ExecutionManager;
-import service.OrderManager;
-import service.OrderReader;
+
 import javax.jms.JMSException;
 
 /**
@@ -36,14 +32,6 @@ public class BeanConfiguration {
     @Autowired
     private Environment env;
 
-    @Autowired
-    private CamelContext camelContext;
-
-    @Bean
-    public ProducerTemplate producerTemplate(){
-        return camelContext.createProducerTemplate();
-    }
-
 
     @Bean
     public ViewResolver viewResolver() {
@@ -55,7 +43,7 @@ public class BeanConfiguration {
         return viewResolver;
     }
 
-    //@Bean(initMethod = "createProducerTemplateFromCamelContext")
+    @Bean(initMethod = "createProducerTemplateFromCamelContext")
     public MainController mainController() throws Exception {
         return new MainController(orderDAO(),executionDAO());
     }
@@ -71,11 +59,6 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public OrderReader orderReader() throws JMSException {
-        return new OrderReader(orderManager());
-    }
-
-    @Bean
     public ExecutionDAOImpl executionDAO(){
         return new ExecutionDAOImpl(dataSource());
     }
@@ -83,16 +66,6 @@ public class BeanConfiguration {
     @Bean
     public OrderDAO orderDAO(){
         return new OrderDAOImpl(dataSource());
-    }
-
-    @Bean
-    public OrderManager orderManager() throws JMSException {
-        return new OrderManager(executionManager(),orderDAO());
-    }
-
-    @Bean
-    ExecutionManager executionManager() throws JMSException {
-        return new ExecutionManager(executionDAO());
     }
 
     @Bean

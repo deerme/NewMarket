@@ -1,22 +1,12 @@
 package test.database;
 
 import bean.test.configuration.BeanTestConfiguration;
-import database.OrderDAOImpl;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.springframework.test.jdbc.JdbcTestUtils;
-import service.OrderManager;
-import javax.jms.JMSException;
-import javax.sql.DataSource;
+
 import static org.junit.Assert.assertEquals;
 
 
