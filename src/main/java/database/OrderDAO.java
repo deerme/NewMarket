@@ -4,9 +4,6 @@ package database;
 import model.Order;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 /**

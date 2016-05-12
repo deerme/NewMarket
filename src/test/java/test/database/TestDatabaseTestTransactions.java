@@ -3,16 +3,12 @@ package test.database;
 import bean.test.configuration.BeanTestConfiguration;
 import database.ExecutionDAO;
 import database.OrderDAO;
-import exceptions.ExceptionFromOrderDao;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.apache.camel.test.spring.CamelSpringJUnit4ClassRunner;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +16,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.springframework.test.jdbc.JdbcTestUtils;
-
-import javax.jms.JMSException;
 import javax.sql.DataSource;
 
 

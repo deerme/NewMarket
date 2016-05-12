@@ -17,7 +17,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
-import javax.jms.JMSException;
 
 /**
  * Created by pizmak on 2016-04-06.
@@ -44,7 +43,7 @@ public class BeanConfiguration {
     }
 
     @Bean(initMethod = "createProducerTemplateFromCamelContext")
-    public MainController mainController() throws Exception {
+    public MainController mainController() {
         return new MainController(orderDAO(),executionDAO());
     }
 

@@ -67,9 +67,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     public void updateOrderToDatabase(int idOrder, int quantity) {
-        int oldQuantity = getQuantityOfOrderWithConcreteId(idOrder);
-        System.out.println("Old quantity"+oldQuantity);
-        this.jdbcTemplate.update("UPDATE ORDERINMARKET SET QUANTITY=? WHERE ID=?;",oldQuantity - quantity, idOrder);
+        this.jdbcTemplate.update("UPDATE ORDERINMARKET SET QUANTITY=? WHERE ID=?;",quantity, idOrder);
         logger.info("Updating into database where id of Order is :" + idOrder + "new quantity is:" + quantity);
     }
 

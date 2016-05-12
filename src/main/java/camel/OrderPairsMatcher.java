@@ -50,14 +50,28 @@ public class OrderPairsMatcher implements Processor {
                 setOfAllUsedIdOfBuyer.add(buyOrder.getId());
                 setOfAllUsedIdOfSeller.add(sellOrder.getId());
 
-                int quantityOfExecution = Math.min(sellOrder.getQuantity(), buyOrder.getQuantity());
-
-                listOfAllExecutionsWhichCanHappen.add("idBuyer="+buyOrder.getId()+" idSeller="+sellOrder.getId()+" quantityOfExecution="+quantityOfExecution);
-
+                listOfAllExecutionsWhichCanHappen.add(createMessageAboutExecution(buyOrder, sellOrder));
             }
         }
 
         return listOfAllExecutionsWhichCanHappen;
+    }
+
+    public String createMessageAboutExecution(Order buyOrder, Order sellOrder){
+        int quantityOfExecution = Math.min(sellOrder.getQuantity(), buyOrder.getQuantity());
+
+        return new StringBuilder()
+                    .append("idBuyer=")
+                    .append(buyOrder.getId())
+                    .append(" idSeller=")
+                    .append(sellOrder.getId())
+                    .append(" quantityOfExecution=")
+                    .append(quantityOfExecution)
+                    .append(" newQuantityBuyer=")
+                    .append(buyOrder.getQuantity() - quantityOfExecution)
+                    .append(" newQuantitySeller=")
+                    .append(sellOrder.getQuantity() - quantityOfExecution)
+                    .toString();
     }
 
 }

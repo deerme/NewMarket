@@ -2,7 +2,6 @@ package bean.test.configuration;
 
 import database.ExecutionDAOImpl;
 import database.OrderDAOImpl;
-
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,10 +10,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-
-import javax.jms.JMSException;
 import javax.sql.DataSource;
-
 import static org.mockito.Mockito.spy;
 
 
