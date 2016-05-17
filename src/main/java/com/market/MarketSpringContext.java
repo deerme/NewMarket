@@ -23,11 +23,16 @@ public class MarketSpringContext extends CamelConfiguration {
 
     @Bean
     public RouteBuilder routeBuilder() {
-        return new MarketRouteBuilder(orderConverter(), orderDAO());
+        return new MarketRouteBuilder(orderConverter(), orderDAO(), executionCreator());
     }
 
     @Bean
     public OrderDAO orderDAO() {
         return new OrderDAOImpl(dataSource);
+    }
+
+    @Bean
+    public ExecutionCreator executionCreator() {
+        return new ExecutionCreatorImpl(orderDAO());
     }
 }

@@ -10,4 +10,5 @@ public interface OrderDAO {
 
     Order2 saveOrder(Order2 order);
     List<Order2> getAllOpenOrders();
+    List<Order2> getAllOpenOrdersByType(String type);
 }
