@@ -1,6 +1,5 @@
 package com.market;
 
-import model.Execution;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
@@ -19,19 +18,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.jdbc.JdbcTestUtils;
-
 import javax.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import java.util.List;
-
 import static com.market.MarketRouteBuilder.MAIN_ROUTE_ENTRY;
 
 /**
  * Created by pizmak on 2016-05-17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = Int1Test.Int1TestConfig.class, loader = AnnotationConfigContextLoader.class)
-public class Int1Test {
+@ContextConfiguration(classes = FirstIntegrationTest.FirstIntegrationTestConfig.class, loader = AnnotationConfigContextLoader.class)
+public class FirstIntegrationTest {
     private static final String NAME_OF_TABLE_WITH_EXECUTIONS = "execution";
     private static final String NAME_OF_TABLE_WITH_ORDERS = "orderinmarket";
 
@@ -114,10 +111,30 @@ public class Int1Test {
         Assert.assertEquals(quantityOfFirstExecution,firstExecution.getQuantity());
         Assert.assertEquals(quantityOfSecondExecution,secondExecution.getQuantity());
     }
+
+    @Test
+    public void testUpdatingQuantityOfMachingOrdersAfterDoneExecution(){
+        Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
+        Assert.assertEquals(0,orderDAO.getAllOpenOrders().size());
+
+        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
+        producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");//
+        producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");//
+
+        List<Order2> listOfAllOrders = orderDAO.getAllOrders();
+        Order2 firstOrder = listOfAllOrders.get(0);
+        Order2 secondOrder = listOfAllOrders.get(1);
+        final int quantityOfFirstOrderAfterExecution = 40;//how should it be written ???
+        final int quantityOfSecondOrderAfterExecution = 0;//
+
+        Assert.assertEquals(quantityOfFirstOrderAfterExecution,firstOrder.getQuantity());
+        Assert.assertEquals(quantityOfSecondOrderAfterExecution,secondOrder.getQuantity());
+
+    }
     @Configuration
     @Import({MarketSpringContext.class})
-    public static class Int1TestConfig {
-        public Int1TestConfig() {
+    public static class FirstIntegrationTestConfig {
+        public FirstIntegrationTestConfig() {
         }
 
         @Bean

@@ -3,7 +3,6 @@ package com.market;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -69,6 +68,25 @@ public class OrderDAOImpl implements OrderDAO {
         );
     }
 
+    @Override
+    public Execution2 updateQuantityOfOrdersAfterDoneExecution(Execution2 execution) {
+        final String sqlUpdateQuantityOfOrderAfterExecution="UPDATE orderinmarket SET quantity=quantity-? WHERE ID=?";
+        jdbcTemplate.update(sqlUpdateQuantityOfOrderAfterExecution,execution.getQuantity(),execution.getIdBuyer());
+        jdbcTemplate.update(sqlUpdateQuantityOfOrderAfterExecution,execution.getQuantity(),execution.getIdSeller());
+        return execution;
+    }
+
+    @Override
+    public List<Order2> getAllOrders() {
+        final String sqlGetAllOrdersQuery = "SELECT * FROM orderinmarket;";
+
+        return jdbcTemplate.query(
+                sqlGetAllOrdersQuery,
+                (rs, rowNum) -> createOrderFromResultSet(rs)
+        );
+
+    }
+
     private Order2 createOrderFromResultSet(ResultSet rs) throws SQLException {
         return new Order2(
                 Optional.of(rs.getInt("id")),
@@ -76,4 +94,5 @@ public class OrderDAOImpl implements OrderDAO {
                 rs.getInt("quantity")
         );
     }
+
 }

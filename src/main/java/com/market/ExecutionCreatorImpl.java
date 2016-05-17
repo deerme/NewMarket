@@ -1,12 +1,10 @@
 package com.market;
 
 import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static com.market.Constants.ORD_TYPE_BUY;
 import static com.market.Constants.ORD_TYPE_SELL;
 

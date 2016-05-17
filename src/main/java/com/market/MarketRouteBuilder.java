@@ -37,6 +37,7 @@ public class MarketRouteBuilder extends RouteBuilder {
                 .bean(executionCreator)
                 .split(body())
                     .bean(executionDAO)
+                    .bean(orderDAO,OrderDAO.UPDATE_ORDER_AFTER_EXECUTION_METHOD_NAME)
                     .bean(executionMessageConverter)
                     .to(JMS_EXECUTION_INFO);
 

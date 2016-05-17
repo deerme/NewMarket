@@ -7,8 +7,15 @@ import java.util.List;
  */
 public interface OrderDAO {
     public final String SAVE_ORDER_METHOD_NAME = "saveOrder";
+    public final String UPDATE_ORDER_AFTER_EXECUTION_METHOD_NAME="updateQuantityOfOrdersAfterDoneExecution";
 
-    Order2 saveOrder(Order2 order);
-    List<Order2> getAllOpenOrders();
-    List<Order2> getAllOpenOrdersByType(String type);
+    public Order2 saveOrder(Order2 order);
+
+    public List<Order2> getAllOpenOrders();
+
+    public List<Order2> getAllOpenOrdersByType(String type);
+
+    public Execution2 updateQuantityOfOrdersAfterDoneExecution(Execution2 execution);
+
+    public List<Order2> getAllOrders();
 }
