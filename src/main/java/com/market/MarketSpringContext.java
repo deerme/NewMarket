@@ -23,7 +23,7 @@ public class MarketSpringContext extends CamelConfiguration {
 
     @Bean
     public RouteBuilder routeBuilder() {
-        return new MarketRouteBuilder(orderConverter(), orderDAO(), executionCreator());
+        return new MarketRouteBuilder(orderConverter(), orderDAO(), executionCreator(),executionDAO(),executionMessageConverter());
     }
 
     @Bean
@@ -34,5 +34,15 @@ public class MarketSpringContext extends CamelConfiguration {
     @Bean
     public ExecutionCreator executionCreator() {
         return new ExecutionCreatorImpl(orderDAO());
+    }
+
+    @Bean
+    public ExecutionDAO executionDAO(){
+        return new ExecutionDAOImpl(dataSource);
+    }
+
+    @Bean
+    public ExecutionMessageConverter executionMessageConverter(){
+        return new ExecutionMessageConverterImpl();
     }
 }

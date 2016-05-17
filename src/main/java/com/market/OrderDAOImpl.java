@@ -26,7 +26,7 @@ public class OrderDAOImpl implements OrderDAO {
         final String insertSql = "INSERT INTO ORDERINMARKET(TYPE,QUANTITY) VALUES(?,?);";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        this.jdbcTemplate.update(
+            jdbcTemplate.update(
                 connection -> {
                     PreparedStatement ps = connection.prepareStatement(insertSql);
                     ps.setString(1, order.getType());
@@ -48,7 +48,7 @@ public class OrderDAOImpl implements OrderDAO {
         final String sqlGetAllOpenOrdersQuery =
                 "SELECT * FROM orderinmarket WHERE quantity > 0";
 
-        return this.jdbcTemplate.query(
+        return jdbcTemplate.query(
                 sqlGetAllOpenOrdersQuery,
                 (rs, rowNum) -> createOrderFromResultSet(rs)
         );
@@ -59,7 +59,7 @@ public class OrderDAOImpl implements OrderDAO {
         final String sqlGetAllOpenOrdersQuery =
                 "SELECT * FROM orderinmarket WHERE quantity > 0 and type = ?";
 
-        return this.jdbcTemplate.query(
+        return jdbcTemplate.query(
                 connection -> {
                     PreparedStatement ps = connection.prepareStatement(sqlGetAllOpenOrdersQuery);
                     ps.setString(1, type);

@@ -1,20 +1,22 @@
 package com.market;
 
+import model.Execution;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * Created by pizmak on 2016-05-17.
  */
-public class ExecutionDaoImpl implements ExecutionDao {
+public class ExecutionDAOImpl implements ExecutionDAO {
     private JdbcTemplate jdbcTemplate;
 
-    public ExecutionDaoImpl(DataSource dataSource) {
+    public ExecutionDAOImpl(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
@@ -23,7 +25,7 @@ public class ExecutionDaoImpl implements ExecutionDao {
         final String insertSql = "INSERT INTO EXECUTION(QUANTITY,ID_ORDER_SELLER,ID_ORDER_BUYER) VALUES(?,?,?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        this.jdbcTemplate.update(
+            jdbcTemplate.update(
                 connection -> {
                     PreparedStatement ps = connection.prepareStatement(insertSql);
                     ps.setInt(1, execution.getQuantity());
@@ -40,5 +42,16 @@ public class ExecutionDaoImpl implements ExecutionDao {
                 execution.getIdSeller(),
                 execution.getQuantity()
         );
+    }
+
+    @Override
+    public List<Execution2> getListOfAllExecutions() {
+        final String sqlGetAllExecutions = "SELECT * FROM EXECUTION";
+        return  jdbcTemplate.query(sqlGetAllExecutions,
+                    (rs, rowNum) -> new Execution2(
+                            Optional.of(rs.getInt("id")),
+                            rs.getInt("id_order_buyer"),
+                            rs.getInt("id_order_seller"),
+                            rs.getInt("quantity")));
     }
 }

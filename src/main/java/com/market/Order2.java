@@ -1,6 +1,7 @@
 package com.market;
 
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 import java.util.Optional;
@@ -44,5 +45,14 @@ final public class Order2 {
     @Override
     public int hashCode() {
         return Objects.hashCode(getId(), getType(), getQuantity());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", Optional.of(id))
+                .add("type", type)
+                .add("quantity", quantity)
+                .toString();
     }
 }
