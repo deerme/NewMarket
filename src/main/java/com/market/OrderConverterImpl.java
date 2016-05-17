@@ -8,7 +8,11 @@ import model.Order;
 public class OrderConverterImpl implements OrderConverter {
     @Override
     public Order convert(String orderStr) {
-        System.out.println("%%%%%%%%%%%%%");
-        return null;
+        String[] splitStr = orderStr.split(" ");
+        Order order = new Order();
+        order.setType(splitStr[0].trim());
+        order.setQuantity(Integer.valueOf(splitStr[1].trim()));
+        System.out.println(">>>order = " + order);
+        return order;
     }
 }
