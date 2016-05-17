@@ -8,41 +8,17 @@ public class Execution {
     private int id;
     private int idBuyer;
     private int idSeller;
-    private int quantityOfExecution;
+    private final int quantityOfExecution;
+    private int quantityOfBuyer;
+    private int quantityOfSeller;
 
-    public Execution(){
-        //  /*  It is necessary in ExecutionDAO implementation  */
-    }
-
-    public Execution( int idBuyer, int idSeller){
-        this.idBuyer = idBuyer;
-        this.idSeller = idSeller;
-    }
-
-    public Execution( int idBuyer, int idSeller,int id,int quantityOfExecution){
-        this(idBuyer,idSeller);
-        this.id = id;
-        this.quantityOfExecution = quantityOfExecution;
-    }
-
-    public int getQuantityOfExecution() {
-        return quantityOfExecution;
-    }
-
-    public void setQuantityOfExecution(int quantityOfExecution) {
-        this.quantityOfExecution = quantityOfExecution;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setIdBuyer(int idBuyer) {
-        this.idBuyer = idBuyer;
-    }
-
-    public void setIdSeller(int idSeller) {
-        this.idSeller = idSeller;
+    private Execution(ExecutionBuilder builder){
+        id = builder.id;
+        idBuyer = builder.idBuyer;
+        idSeller = builder.idSeller;
+        quantityOfExecution = builder.quantityOfExecution;
+        quantityOfBuyer = builder.quantityOfBuyer;
+        quantityOfSeller = builder.quantityOfSeller;
     }
 
     public int getId() {
@@ -56,6 +32,61 @@ public class Execution {
     public int getIdSeller() {
         return idSeller;
     }
+
+    public int getQuantityOfExecution() {
+        return quantityOfExecution;
+    }
+
+    public int getQuantityOfBuyer() {
+        return quantityOfBuyer;
+    }
+
+    public int getQuantityOfSeller() {
+        return quantityOfSeller;
+    }
+
+        public static class ExecutionBuilder{
+            private int id;
+            private int idBuyer;
+            private int idSeller;
+            private final int quantityOfExecution;
+            private int quantityOfBuyer;
+            private int quantityOfSeller;
+
+            public ExecutionBuilder(int quantityOfExecution) {
+                this.quantityOfExecution = quantityOfExecution;
+            }
+
+            public ExecutionBuilder id(int idOfExecution){
+                this.id = idOfExecution;
+                return this;
+            }
+
+            public ExecutionBuilder idBuyer(int idBuyer){
+                this.idBuyer = idBuyer;
+                return this;
+            }
+
+            public ExecutionBuilder idSeller(int idSeller){
+                this.idSeller = idSeller;
+                return  this;
+            }
+
+            public ExecutionBuilder quantityOfSeller(int quantityOfSeller){
+                this.quantityOfSeller = quantityOfSeller;
+                return  this;
+            }
+
+            public ExecutionBuilder quantityOfBuyer(int quantityOfBuyer){
+                this.quantityOfBuyer = quantityOfBuyer;
+                return  this;
+            }
+
+            public Execution build(){
+                return new Execution(this);
+            }
+
+        }
 
     @Override
     public String toString() {

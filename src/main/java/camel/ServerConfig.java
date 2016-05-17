@@ -32,8 +32,14 @@ public class ServerConfig  extends CamelConfiguration {
                         .end()
                         .bean(OrderPairsMatcher.class,"process")
                         .split(body())
-                        .bean(ExecutionManager.class)
-                        .to("jms:testExecutionsInformationQueue");
+                        .choice()
+                            .when(body().contains("No executions available"))
+                                .log(LoggingLevel.INFO,"It wasn`t any matched orders to create execution")
+                            .when(body().isNotEqualTo("No executions available"))
+                                .log(LoggingLevel.INFO,"Starting from execution: ${body}" )
+                                .bean(ExecutionManager.class)
+                                .to("jms:testExecutionsInformationQueue")
+                        .end();
 
                 from("jms:testQueueWithNewOrders")
                         .errorHandler(deadLetterChannel("jms:testQueueWithNewOrders.Dead").useOriginalMessage())

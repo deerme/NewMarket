@@ -1,5 +1,6 @@
 package database;
 
+import model.Order;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,8 @@ public class OrderDAOSave implements Processor{
 
     @Override
     public void process(Exchange exchange) throws Exception {
-       String bodyWithOrder = (String) exchange.getIn().getBody();
+       Order bodyWithOrder = (Order) exchange.getIn().getBody();
 
-       String [] splitted = bodyWithOrder.split("type=");
-       String [] splittedWithType = splitted[1].split(" ");
-       String [] splittedWithQuantity = splittedWithType[1].split("quantity=");
-
-       orderDAO.addOrderToDatabase(splittedWithType[0],Integer.valueOf(splittedWithQuantity[1]));
+       orderDAO.addOrderToDatabase(bodyWithOrder.getType(),bodyWithOrder.getQuantity());
     }
 }

@@ -1,7 +1,13 @@
 package bean.test.configuration;
 
+import camel.ExecutionManager;
+import camel.OrderPairsMatcher;
+import camel.OrderSplitterProcessor;
 import database.ExecutionDAOImpl;
+import database.OrderDAO;
 import database.OrderDAOImpl;
+import database.OrderDAOSave;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +16,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+
+import javax.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import static org.mockito.Mockito.spy;
 
@@ -27,22 +35,22 @@ public class BeanTestConfiguration  {
 
         @Bean
         public ExecutionDAOImpl testExecutionDAO(){
-            return new ExecutionDAOImpl(dataSource());
+            return new ExecutionDAOImpl(testDataSource());
         }
 
         @Bean
         public OrderDAOImpl testOrderDAO(){
-            return new OrderDAOImpl(dataSource());
+            return new OrderDAOImpl(testDataSource());
         }
 
         @Bean
         public OrderDAOImpl mockTestOrderDAO(){
-            return spy(new OrderDAOImpl(dataSource()));
+            return spy(new OrderDAOImpl(testDataSource()));
         }
 
 
         @Bean
-        public DataSource dataSource() {
+        public DataSource testDataSource() {
             EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
 
             return builder.setType(EmbeddedDatabaseType.H2).addScript("schema.sql").addScript("data.sql").build();
@@ -50,6 +58,41 @@ public class BeanTestConfiguration  {
 
         @Bean
         public DataSourceTransactionManager dataSourceTransactionManager(){
-            return new DataSourceTransactionManager(dataSource());
+            return new DataSourceTransactionManager(testDataSource());
+        }
+
+        @Bean
+        ConnectionFactory connectionFactory(){
+        return new ActiveMQConnectionFactory("tcp://localhost:61616");
+    }
+
+        @Bean
+        OrderSplitterProcessor orderSplitterProcessor(){
+            return new OrderSplitterProcessor();
+        }
+
+        @Bean
+        OrderDAOSave orderDAOSave(){
+            return new OrderDAOSave();
+        }
+
+        @Bean
+        OrderPairsMatcher orderPairsMatcher(){
+            return  new OrderPairsMatcher();
+        }
+
+        @Bean
+        ExecutionManager executionManager2(){
+            return new ExecutionManager();
+        }
+
+        @Bean
+        public ExecutionDAOImpl executionDAO(){
+            return new ExecutionDAOImpl(testDataSource());
+        }
+
+        @Bean
+        public OrderDAO orderDAO(){
+            return new OrderDAOImpl(testDataSource());
         }
 }

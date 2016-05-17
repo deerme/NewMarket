@@ -1,6 +1,7 @@
 package camel;
 
 import database.OrderDAO;
+import model.Execution;
 import model.Order;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -18,24 +19,25 @@ import java.util.Set;
  * Created by pizmak on 2016-05-11.
  */
 public class OrderPairsMatcher implements Processor {
-    private List<String> listOfAllExecutionsWhichCanHappen ;
-
-    public OrderPairsMatcher() {
-        listOfAllExecutionsWhichCanHappen = new ArrayList<>();
-    }
+    private List<Execution> listOfAllExecutionsWhichCanHappen ;
 
     @Autowired
     private OrderDAO orderDAO;
 
+    public OrderPairsMatcher() {
+        listOfAllExecutionsWhichCanHappen = new ArrayList<>();
+    }
+    
     @Override
     public void process(Exchange exchange) throws Exception {
         Message message = new DefaultMessage();
+        if(checkIfMatchesSellAndBuyOrders().isEmpty())  message.setBody("No executions available");
         message.setBody(checkIfMatchesSellAndBuyOrders());
         exchange.setOut(message);
     }
 
 
-    public List<String> checkIfMatchesSellAndBuyOrders () throws JMSException {
+    public List<Execution> checkIfMatchesSellAndBuyOrders () throws JMSException {
         List<ImmutablePair<Order, Order>> listOfAllAvailablePairsOfOrders = orderDAO.getPairsOfMatchingOrders();
         Set<Integer> setOfAllUsedIdOfBuyer = new HashSet<>();
         Set<Integer> setOfAllUsedIdOfSeller = new HashSet<>();
@@ -50,28 +52,12 @@ public class OrderPairsMatcher implements Processor {
                 setOfAllUsedIdOfBuyer.add(buyOrder.getId());
                 setOfAllUsedIdOfSeller.add(sellOrder.getId());
 
-                listOfAllExecutionsWhichCanHappen.add(createMessageAboutExecution(buyOrder, sellOrder));
+                int quantityOfExecution = Math.min(sellOrder.getQuantity(), buyOrder.getQuantity());
+
+                listOfAllExecutionsWhichCanHappen.add(new Execution.ExecutionBuilder(quantityOfExecution).idBuyer(buyOrder.getId()).idSeller(sellOrder.getId()).quantityOfBuyer(buyOrder.getQuantity()).quantityOfSeller(sellOrder.getQuantity()).build());
             }
         }
 
         return listOfAllExecutionsWhichCanHappen;
     }
-
-    public String createMessageAboutExecution(Order buyOrder, Order sellOrder){
-        int quantityOfExecution = Math.min(sellOrder.getQuantity(), buyOrder.getQuantity());
-
-        return new StringBuilder()
-                    .append("idBuyer=")
-                    .append(buyOrder.getId())
-                    .append(" idSeller=")
-                    .append(sellOrder.getId())
-                    .append(" quantityOfExecution=")
-                    .append(quantityOfExecution)
-                    .append(" newQuantityBuyer=")
-                    .append(buyOrder.getQuantity() - quantityOfExecution)
-                    .append(" newQuantitySeller=")
-                    .append(sellOrder.getQuantity() - quantityOfExecution)
-                    .toString();
-    }
-
 }
