@@ -1,14 +1,14 @@
-package controller;
+package com.market.web;
 
 /**
  * Created by pizmak on 2016-04-07.
  */
 
-import database.ExecutionDAO;
-import database.OrderDAO;
-import exception.GeneralException;
-import model.Execution;
-import model.Order;
+import com.market.model.Execution2;
+import com.market.database.ExecutionDAO;
+import com.market.model.Order2;
+import com.market.database.OrderDAO;
+import com.market.exception.GeneralException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
@@ -33,13 +33,14 @@ public class MainController {
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
     private ProducerTemplate producerTemplate;
 
-//    public MainController(OrderDAO orderDAO, ExecutionDAO executionDAO) {
-//        this.orderDAO = orderDAO;
-//        this.executionDAO = executionDAO;
+//    public MainController(OldOrderDAO oldOrderDAO, OldExecutionDAO oldExecutionDAO) {
+//        this.oldOrderDAO = oldOrderDAO;
+//        this.oldExecutionDAO = oldExecutionDAO;
 //    }
 
     public MainController(OrderDAO orderDAO, ExecutionDAO executionDAO) {
-
+         this.orderDAO = orderDAO;
+         this.executionDAO = executionDAO;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -50,7 +51,7 @@ public class MainController {
 
     @RequestMapping(value = "/orders", method = RequestMethod.GET)
     public String sayHelloAgain(ModelMap model) {
-        List<Order> listOfAllOrders = orderDAO.getAllOrders();
+        List<Order2> listOfAllOrders = orderDAO.getAllOrders();
 
         model.addAttribute("listOfAllOrders", listOfAllOrders);
         model.addAllAttributes(listOfAllOrders);
@@ -59,7 +60,7 @@ public class MainController {
 
     @RequestMapping(value = "/executions", method = RequestMethod.GET)
     public String seeAllExecutions(ModelMap model) {
-        List<Execution> listOfAllExecutions = executionDAO.getAllExecutions();
+        List<Execution2> listOfAllExecutions = executionDAO.getListOfAllExecutions();
         model.addAttribute("listOfAllExecutions", listOfAllExecutions);
         return "executions";
     }

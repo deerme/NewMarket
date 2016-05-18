@@ -1,12 +1,15 @@
-package com.market;
+package com.market.service;
 
+import com.market.database.OrderDAO;
+import com.market.model.Execution2;
+import com.market.model.Order2;
 import org.apache.commons.lang3.tuple.Pair;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import static com.market.Constants.ORD_TYPE_BUY;
-import static com.market.Constants.ORD_TYPE_SELL;
+import static com.market.service.Constants.ORD_TYPE_BUY;
+import static com.market.service.Constants.ORD_TYPE_SELL;
 
 /**
  * Created by pizmak on 2016-05-17.

@@ -1,4 +1,4 @@
-package com.market;
+package com.market.service;
 
 /**
  * Created by pizmak on 2016-05-17.

@@ -1,6 +1,6 @@
-package com.market;
+package com.market.service;
 
-import model.Order;
+import com.market.model.Order2;
 
 /**
  * Created by pizmak on 2016-05-17.

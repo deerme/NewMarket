@@ -1,6 +1,9 @@
-package com.market;
+package com.market.database;
 
 
+import com.market.model.Execution2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -17,6 +20,7 @@ import java.util.Optional;
 @Transactional
 public class ExecutionDAOImpl implements ExecutionDAO {
     private JdbcTemplate jdbcTemplate;
+    private Logger logger = LoggerFactory.getLogger("auditLogger");
 
     public ExecutionDAOImpl(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -38,6 +42,7 @@ public class ExecutionDAOImpl implements ExecutionDAO {
                 keyHolder
         );
 
+        logger.info("Added order to database.Auto-generated id:" + Optional.of(keyHolder.getKey().intValue()) + " Quantity of order: " +execution.getQuantity()+ " Id seller: " + execution.getIdSeller() +" Id buyer: "+execution.getIdBuyer());
         return new Execution2(
                 Optional.of(keyHolder.getKey().intValue()),
                 execution.getIdBuyer(),

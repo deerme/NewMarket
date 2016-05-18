@@ -1,4 +1,6 @@
-package com.market;
+package com.market.service;
+
+import com.market.model.Execution2;
 
 /**
  * Created by pizmak on 2016-05-17.

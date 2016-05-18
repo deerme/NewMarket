@@ -1,4 +1,4 @@
-package com.market;
+package com.market.model;
 
 
 import com.google.common.base.MoreObjects;

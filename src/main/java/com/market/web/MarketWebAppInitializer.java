@@ -1,6 +1,6 @@
-package bean.configuration;
+package com.market.web;
 
-import com.market.MarketSpringContext;
+import com.market.camel.MarketSpringContext;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;

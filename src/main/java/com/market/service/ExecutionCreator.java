@@ -1,4 +1,7 @@
-package com.market;
+package com.market.service;
+
+import com.market.model.Execution2;
+import com.market.model.Order2;
 
 import java.util.List;
 

@@ -1,6 +1,11 @@
-package com.market;
+package com.market.camel;
 
-import camel.MainLogger;
+
+import com.market.service.ExecutionCreator;
+import com.market.service.ExecutionMessageConverter;
+import com.market.service.OrderConverter;
+import com.market.database.ExecutionDAO;
+import com.market.database.OrderDAO;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,7 +47,10 @@ public class MarketRouteBuilder extends RouteBuilder {
 
         from(WEB_ROUTE_ENTRY)
                 .id(WEB_ROUTE_ENTRY)
-                .to(JMS_NEW_ORDERS)
+                .to(JMS_NEW_ORDERS);
+
+
+        from(JMS_NEW_ORDERS)
                 .errorHandler(deadLetterChannel("jms:testQueueWithNewOrders.Dead").useOriginalMessage())
                 .to(MAIN_ROUTE_ENTRY);
 

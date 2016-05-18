@@ -1,5 +1,7 @@
-package com.market;
+package com.market.database;
 
+import com.market.model.Execution2;
+import com.market.model.Order2;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,4 +21,6 @@ public interface OrderDAO {
     Execution2 updateQuantityOfOrdersAfterDoneExecution(Execution2 execution);
     @Transactional
     List<Order2> getAllOrders();
+    @Transactional
+    int getQuantityOfOrderById(int id);
 }

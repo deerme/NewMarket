@@ -1,4 +1,4 @@
-package database;
+package com.market.database;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;

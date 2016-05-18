@@ -1,6 +1,10 @@
 package com.market;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
+import com.market.camel.MarketSpringContext;
+import com.market.database.ExecutionDAO;
+import com.market.database.OrderDAO;
+import com.market.model.Execution2;
+import com.market.model.Order2;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
@@ -14,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -25,7 +30,7 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.market.MarketRouteBuilder.*;
+import static com.market.camel.MarketRouteBuilder.*;
 
 /**
  * Created by pizmak on 2016-05-17.
@@ -169,6 +174,7 @@ public class FirstIntegrationTest {
         public FirstIntegrationTestConfig() {
         }
 
+        @Primary
         @Bean
         public DataSource dataSource() {
             return new EmbeddedDatabaseBuilder()

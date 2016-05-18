@@ -1,10 +1,12 @@
-package com.market;
+package com.market.database;
 
+import com.market.model.Execution2;
+import com.market.model.Order2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
@@ -18,6 +20,7 @@ import java.util.Optional;
  */
 public class OrderDAOImpl implements OrderDAO {
     private JdbcTemplate jdbcTemplate;
+    private Logger logger = LoggerFactory.getLogger("auditLogger");
 
     public OrderDAOImpl(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -37,6 +40,8 @@ public class OrderDAOImpl implements OrderDAO {
                 },
                 keyHolder
         );
+
+        logger.info("Added order to database.Auto-generated id:" +  Optional.of(keyHolder.getKey().intValue()) +" Type of order"+order.getType()+" Quantity of order" +order.getQuantity());
 
         return new Order2(
                 Optional.of(keyHolder.getKey().intValue()),
@@ -63,8 +68,13 @@ public class OrderDAOImpl implements OrderDAO {
     @Override
     public Execution2 updateQuantityOfOrdersAfterDoneExecution(Execution2 execution) {
         final String sqlUpdateQuantityOfOrderAfterExecution="UPDATE orderinmarket SET quantity=quantity-? WHERE ID=?";
+
         jdbcTemplate.update(sqlUpdateQuantityOfOrderAfterExecution,execution.getQuantity(),execution.getIdBuyer());
         jdbcTemplate.update(sqlUpdateQuantityOfOrderAfterExecution,execution.getQuantity(),execution.getIdSeller());
+
+        logger.info("Update order to database.Id of order:" + execution.getIdBuyer()+" New quantity is:" + getQuantityOfOrderById(execution.getIdBuyer()));
+        logger.info("Update order to database.Id of order:" + execution.getIdSeller()+" New quantity is:" + getQuantityOfOrderById(execution.getIdSeller()));
+
         return execution;
     }
 
@@ -77,6 +87,13 @@ public class OrderDAOImpl implements OrderDAO {
                 (rs, rowNum) -> createOrderFromResultSet(rs)
         );
 
+    }
+
+    @Override
+    public int getQuantityOfOrderById(int id) {
+        final String sqlGetAllOpenOrdersQuery = "SELECT quantity FROM orderinmarket WHERE id= ?;";
+
+        return jdbcTemplate.queryForObject(sqlGetAllOpenOrdersQuery,Integer.class,id);
     }
 
     private Order2 createOrderFromResultSet(ResultSet rs) throws SQLException {

@@ -35,7 +35,7 @@
                     <td><c:out value="${execution.id}"/></td>
                     <td><c:out value="${execution.idBuyer}"/></td>
                     <td><c:out value="${execution.idSeller}"/></td>
-                    <td><c:out value="${execution.quantityOfExecution}"/></td>
+                    <td><c:out value="${execution.quantity}"/></td>
                 </tr>
             </c:forEach>
         </table>

@@ -1,4 +1,4 @@
-package exception;
+package com.market.exception;
 
 /**
  * Created by PBanasiak on 3/29/2016.

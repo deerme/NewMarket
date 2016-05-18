@@ -1,5 +1,6 @@
-package com.market;
+package com.market.database;
 
+import com.market.model.Execution2;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

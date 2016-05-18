@@ -26,20 +26,20 @@
     </jdbc:embedded-database>
 
     <bean id="testExecutionManager" class="service.ExecutionManager">
-        <property name="executionDAO" ref="testExecutionDao"/>
+        <property name="oldExecutionDAO" ref="testExecutionDao"/>
     </bean>
 
     <bean id="testOrderManager" class="service.OrderManager">
         <property name="executionManager" ref="testExecutionManager"/>
-        <property name="orderDAO" ref="testOrderDao"/>
+        <property name="oldOrderDAO" ref="testOrderDao"/>
     </bean>
 
-    <bean id="testOrderDao" class="database.OrderDAOImpl">
+    <bean id="testOrderDao" class="database.OldOrderDAOImpl">
         <property name="dataSource" ref="dataSource"/>
     </bean>
     <mockito:spy beanName="testOrderDao" />
 
-    <bean id="testExecutionDao" class="database.ExecutionDAOImpl">
+    <bean id="testExecutionDao" class="database.OldExecutionDAOImpl">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 </beans>
