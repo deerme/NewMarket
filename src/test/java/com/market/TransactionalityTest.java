@@ -30,8 +30,7 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.market.MarketRouteBuilder.JMS_EXECUTION_INFO;
-import static com.market.MarketRouteBuilder.MAIN_ROUTE_ENTRY;
+import static com.market.MarketRouteBuilder.*;
 
 /**
  * Created by pizmak on 2016-05-17.
@@ -57,16 +56,26 @@ public class TransactionalityTest {
     @EndpointInject(uri = "mock:" + JMS_EXECUTION_INFO)
     private MockEndpoint jmsEndPoint;
 
+    @EndpointInject(uri = "mock:" + JMS_NEW_ORDERS)
+    private MockEndpoint jmsStartPoint;
+
     @Before
     public void cleanDataBase() throws Exception {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
         camelContext.getRouteDefinition(MAIN_ROUTE_ENTRY).adviceWith(camelContext, new AdviceWithRouteBuilder() {
             @Override
             public void configure() throws Exception {
-                mockEndpointsAndSkip(JMS_EXECUTION_INFO);
+                mockEndpointsAndSkip(JMS_EXECUTION_INFO,JMS_NEW_ORDERS);
             }
         });
         jmsEndPoint.reset();
+        camelContext.getRouteDefinition(WEB_ROUTE_ENTRY).adviceWith(camelContext, new AdviceWithRouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                mockEndpointsAndSkip(JMS_NEW_ORDERS);
+            }
+        });
+        jmsStartPoint.reset();
     }
 
     @Test
@@ -78,9 +87,9 @@ public class TransactionalityTest {
                 .thenThrow(exception);
 
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
-        producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "SELL 1");
+        producerTemplate.sendBody(JMS_NEW_ORDERS, "SELL 1");
         try {
-            producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "BUY 1");
+            producerTemplate.sendBody(JMS_NEW_ORDERS, "BUY 1");
         } catch (Exception ex) {
 //            Assert.assertTrue(exception.equals(ex));
             Assert.assertEquals(0, orderDAO.getAllOrders().size());

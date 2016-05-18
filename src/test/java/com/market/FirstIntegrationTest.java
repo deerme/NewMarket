@@ -21,14 +21,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.jdbc.JdbcTestUtils;
-
-import javax.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.market.MarketRouteBuilder.JMS_EXECUTION_INFO;
-import static com.market.MarketRouteBuilder.MAIN_ROUTE_ENTRY;
+import static com.market.MarketRouteBuilder.*;
 
 /**
  * Created by pizmak on 2016-05-17.
@@ -52,6 +49,9 @@ public class FirstIntegrationTest {
     @EndpointInject(uri = "mock:" + JMS_EXECUTION_INFO)
     private MockEndpoint jmsEndPoint;
 
+    @EndpointInject(uri = "mock:" + JMS_NEW_ORDERS)
+    private MockEndpoint jmsStartPoint;
+
     @Before
     public void cleanDataBase() throws Exception {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
@@ -62,6 +62,14 @@ public class FirstIntegrationTest {
             }
         });
         jmsEndPoint.reset();
+
+        camelContext.getRouteDefinition(WEB_ROUTE_ENTRY).adviceWith(camelContext, new AdviceWithRouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                mockEndpointsAndSkip(JMS_NEW_ORDERS);
+            }
+        });
+        jmsStartPoint.reset();
     }
 
     @Test
@@ -69,7 +77,7 @@ public class FirstIntegrationTest {
         Assert.assertEquals(0, orderDAO.getAllOrders().size());
 
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
-        producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "SELL 147");
+        producerTemplate.sendBody(WEB_ROUTE_ENTRY, "SELL 147");
 
         List<Order2> allOpenOrders = orderDAO.getAllOrders();
         Assert.assertEquals(1,  allOpenOrders.size());

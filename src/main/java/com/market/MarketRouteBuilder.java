@@ -1,5 +1,6 @@
 package com.market;
 
+import camel.MainLogger;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -8,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class MarketRouteBuilder extends RouteBuilder {
     public static final  String MAIN_ROUTE_ENTRY = "direct:mainRoute";
-    public static final String JMS_EXECUTION_INFO = "jms:testExecutionsInformationQueue";
+    public static final  String JMS_EXECUTION_INFO = "jms:testExecutionsInformationQueue";
+    public static final  String JMS_NEW_ORDERS = "jms:testQueueWithNewOrders";
+    public static final  String WEB_ROUTE_ENTRY = "direct:webRoute";
 
     @Autowired
     private OrderConverter orderConverter;
@@ -27,7 +30,7 @@ public class MarketRouteBuilder extends RouteBuilder {
                 .id(MAIN_ROUTE_ENTRY)
                 .transacted()
 //                .onException(Throwable.class).handled(false)
-                .markRollbackOnly()
+               // .markRollbackOnly()
                 .bean(orderConverter)
                 .bean(orderDAO, OrderDAO.SAVE_ORDER_METHOD_NAME)
                 .bean(executionCreator)
@@ -36,6 +39,12 @@ public class MarketRouteBuilder extends RouteBuilder {
                     .bean(orderDAO,OrderDAO.UPDATE_ORDER_AFTER_EXECUTION_METHOD_NAME)
                     .bean(executionMessageConverter)
                     .to(JMS_EXECUTION_INFO);
+
+        from(WEB_ROUTE_ENTRY)
+                .id(WEB_ROUTE_ENTRY)
+                .to(JMS_NEW_ORDERS)
+                .errorHandler(deadLetterChannel("jms:testQueueWithNewOrders.Dead").useOriginalMessage())
+                .to(MAIN_ROUTE_ENTRY);
 
     }
 }

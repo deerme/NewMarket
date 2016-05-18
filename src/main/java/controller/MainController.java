@@ -33,9 +33,13 @@ public class MainController {
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
     private ProducerTemplate producerTemplate;
 
+//    public MainController(OrderDAO orderDAO, ExecutionDAO executionDAO) {
+//        this.orderDAO = orderDAO;
+//        this.executionDAO = executionDAO;
+//    }
+
     public MainController(OrderDAO orderDAO, ExecutionDAO executionDAO) {
-        this.orderDAO = orderDAO;
-        this.executionDAO = executionDAO;
+
     }
 
     @RequestMapping(method = RequestMethod.GET)
