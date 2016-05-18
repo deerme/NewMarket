@@ -1,7 +1,7 @@
 package com.market.database;
 
-import com.market.model.Execution2;
-import com.market.model.Order2;
+import com.market.model.Execution;
+import com.market.model.Order;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -14,13 +14,13 @@ public interface OrderDAO {
     final String UPDATE_ORDER_AFTER_EXECUTION_METHOD_NAME="updateQuantityOfOrdersAfterDoneExecution";
 
     @Transactional
-    Order2 saveOrder(Order2 order);
+    Order saveOrder(Order order);
     @Transactional
-    List<Order2> getAllOpenOrdersByType(String type);
+    List<Order> getAllOpenOrdersByType(String type);
     @Transactional
-    Execution2 updateQuantityOfOrdersAfterDoneExecution(Execution2 execution);
+    Execution updateQuantityOfOrdersAfterDoneExecution(Execution execution);
     @Transactional
-    List<Order2> getAllOrders();
+    List<Order> getAllOrders();
     @Transactional
     int getQuantityOfOrderById(int id);
 }

@@ -1,6 +1,6 @@
 package test.database;
 
-import bean.test.configuration.BeanTestConfiguration;
+
 
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;

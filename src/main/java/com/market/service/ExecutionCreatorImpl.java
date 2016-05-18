@@ -1,8 +1,8 @@
 package com.market.service;
 
 import com.market.database.OrderDAO;
-import com.market.model.Execution2;
-import com.market.model.Order2;
+import com.market.model.Execution;
+import com.market.model.Order;
 import org.apache.commons.lang3.tuple.Pair;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,8 +22,8 @@ public class ExecutionCreatorImpl implements ExecutionCreator {
     }
 
     @Override
-    public List<Execution2> process(Order2 order) {
-        List<Order2> openedOrdersOrdered = orderDAO.getAllOpenOrdersByType(inverseType(order.getType()));
+    public List<Execution> process(Order order) {
+        List<Order> openedOrdersOrdered = orderDAO.getAllOpenOrdersByType(inverseType(order.getType()));
         Collections.sort(
                 openedOrdersOrdered,
                 (o1, o2) -> o1.getQuantity() < o2.getQuantity() ? -1
@@ -31,22 +31,22 @@ public class ExecutionCreatorImpl implements ExecutionCreator {
                         : 1
         );
 
-        List<Execution2> result = new ArrayList<>();
-        for (Pair<Order2,Integer> execPair: getFirstOrdersBySummQty(openedOrdersOrdered, order.getQuantity())) {
-            result.add(new Execution2(
+        List<Execution> result = new ArrayList<>();
+        for (Pair<Order,Integer> execPair: getFirstOrdersBySummQty(openedOrdersOrdered, order.getQuantity())) {
+            result.add(new Execution(
                     Optional.empty(),
                     getIdBuyer(order, execPair.getLeft()),
                     getIdSeller(order, execPair.getLeft()),
                     execPair.getRight()
             ));
         }
-        for (Execution2 exec : result) {
+        for (Execution exec : result) {
             System.out.println(">>>Exec = "  + exec);
         }
         return result;
     }
 
-    private int getIdBuyer(Order2 o1, Order2 o2) {
+    private int getIdBuyer(Order o1, Order o2) {
         if (ORD_TYPE_BUY.equals(o1.getType())) {
             return o1.getId().get();
         } else {
@@ -54,7 +54,7 @@ public class ExecutionCreatorImpl implements ExecutionCreator {
         }
     }
 
-    private int getIdSeller(Order2 o1, Order2 o2) {
+    private int getIdSeller(Order o1, Order o2) {
         if (ORD_TYPE_SELL.equals(o1.getType())) {
             return o1.getId().get();
         } else {
@@ -62,10 +62,10 @@ public class ExecutionCreatorImpl implements ExecutionCreator {
         }
     }
 
-    private List<Pair<Order2, Integer>> getFirstOrdersBySummQty(List<Order2> orders, int sumQty) {
-        List<Pair<Order2, Integer>> result = new ArrayList<>();
+    private List<Pair<Order, Integer>> getFirstOrdersBySummQty(List<Order> orders, int sumQty) {
+        List<Pair<Order, Integer>> result = new ArrayList<>();
         int leftQty = sumQty;
-        for (Order2 oppositeOrder : orders) {
+        for (Order oppositeOrder : orders) {
             if (leftQty <= 0) {
                 break;
             }

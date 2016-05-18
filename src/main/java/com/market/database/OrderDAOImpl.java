@@ -1,7 +1,7 @@
 package com.market.database;
 
-import com.market.model.Execution2;
-import com.market.model.Order2;
+import com.market.model.Execution;
+import com.market.model.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,7 +27,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public Order2 saveOrder(Order2 order) {
+    public Order saveOrder(Order order) {
         final String insertSql = "INSERT INTO ORDERINMARKET(TYPE,QUANTITY) VALUES(?,?);";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -43,7 +43,7 @@ public class OrderDAOImpl implements OrderDAO {
 
         logger.info("Added order to database.Auto-generated id:" +  Optional.of(keyHolder.getKey().intValue()) +" Type of order"+order.getType()+" Quantity of order" +order.getQuantity());
 
-        return new Order2(
+        return new Order(
                 Optional.of(keyHolder.getKey().intValue()),
                 order.getType(),
                 order.getQuantity()
@@ -51,7 +51,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public List<Order2> getAllOpenOrdersByType(String type) {
+    public List<Order> getAllOpenOrdersByType(String type) {
         final String sqlGetAllOpenOrdersQuery =
                 "SELECT * FROM orderinmarket WHERE quantity > 0 and type = ?";
 
@@ -66,7 +66,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public Execution2 updateQuantityOfOrdersAfterDoneExecution(Execution2 execution) {
+    public Execution updateQuantityOfOrdersAfterDoneExecution(Execution execution) {
         final String sqlUpdateQuantityOfOrderAfterExecution="UPDATE orderinmarket SET quantity=quantity-? WHERE ID=?";
 
         jdbcTemplate.update(sqlUpdateQuantityOfOrderAfterExecution,execution.getQuantity(),execution.getIdBuyer());
@@ -79,7 +79,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public List<Order2> getAllOrders() {
+    public List<Order> getAllOrders() {
         final String sqlGetAllOrdersQuery = "SELECT * FROM orderinmarket;";
 
         return jdbcTemplate.query(
@@ -96,8 +96,8 @@ public class OrderDAOImpl implements OrderDAO {
         return jdbcTemplate.queryForObject(sqlGetAllOpenOrdersQuery,Integer.class,id);
     }
 
-    private Order2 createOrderFromResultSet(ResultSet rs) throws SQLException {
-        return new Order2(
+    private Order createOrderFromResultSet(ResultSet rs) throws SQLException {
+        return new Order(
                 Optional.of(rs.getInt("id")),
                 rs.getString("type"),
                 rs.getInt("quantity")

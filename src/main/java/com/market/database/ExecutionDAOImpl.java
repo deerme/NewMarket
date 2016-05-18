@@ -1,14 +1,13 @@
 package com.market.database;
 
 
-import com.market.model.Execution2;
+import com.market.model.Execution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -27,7 +26,7 @@ public class ExecutionDAOImpl implements ExecutionDAO {
     }
 
     @Override
-    public Execution2 saveExecution(Execution2 execution) {
+    public Execution saveExecution(Execution execution) {
         final String insertSql = "INSERT INTO EXECUTION(QUANTITY,ID_ORDER_SELLER,ID_ORDER_BUYER) VALUES(?,?,?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -43,7 +42,7 @@ public class ExecutionDAOImpl implements ExecutionDAO {
         );
 
         logger.info("Added order to database.Auto-generated id:" + Optional.of(keyHolder.getKey().intValue()) + " Quantity of order: " +execution.getQuantity()+ " Id seller: " + execution.getIdSeller() +" Id buyer: "+execution.getIdBuyer());
-        return new Execution2(
+        return new Execution(
                 Optional.of(keyHolder.getKey().intValue()),
                 execution.getIdBuyer(),
                 execution.getIdSeller(),
@@ -52,10 +51,10 @@ public class ExecutionDAOImpl implements ExecutionDAO {
     }
 
     @Override
-    public List<Execution2> getListOfAllExecutions() {
+    public List<Execution> getListOfAllExecutions() {
         final String sqlGetAllExecutions = "SELECT * FROM EXECUTION";
         return  jdbcTemplate.query(sqlGetAllExecutions,
-                    (rs, rowNum) -> new Execution2(
+                    (rs, rowNum) -> new Execution(
                             Optional.of(rs.getInt("id")),
                             rs.getInt("id_order_buyer"),
                             rs.getInt("id_order_seller"),

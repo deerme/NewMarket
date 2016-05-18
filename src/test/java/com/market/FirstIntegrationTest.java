@@ -3,8 +3,8 @@ package com.market;
 import com.market.camel.MarketSpringContext;
 import com.market.database.ExecutionDAO;
 import com.market.database.OrderDAO;
-import com.market.model.Execution2;
-import com.market.model.Order2;
+import com.market.model.Execution;
+import com.market.model.Order;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
@@ -82,11 +82,11 @@ public class FirstIntegrationTest {
         Assert.assertEquals(0, orderDAO.getAllOrders().size());
 
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
-        producerTemplate.sendBody(WEB_ROUTE_ENTRY, "SELL 147");
+        producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "SELL 147");
 
-        List<Order2> allOpenOrders = orderDAO.getAllOrders();
+        List<Order> allOpenOrders = orderDAO.getAllOrders();
         Assert.assertEquals(1,  allOpenOrders.size());
-        Order2 order = allOpenOrders.get(0);
+        Order order = allOpenOrders.get(0);
         Assert.assertEquals("SELL", order.getType());
         Assert.assertEquals(147, order.getQuantity());
     }
@@ -116,9 +116,9 @@ public class FirstIntegrationTest {
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 100");
 
         //then
-        List<Execution2> listOfAllExecutions = executionDAO.getListOfAllExecutions();
+        List<Execution> listOfAllExecutions = executionDAO.getListOfAllExecutions();
         Assert.assertEquals(1,listOfAllExecutions.size());
-        Execution2 execution = listOfAllExecutions.get(0);
+        Execution execution = listOfAllExecutions.get(0);
 
         final int quantityOfExecution = 100;
         Assert.assertEquals(quantityOfExecution,execution.getQuantity());
@@ -158,9 +158,9 @@ public class FirstIntegrationTest {
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");//
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");//
 
-        List<Order2> listOfAllOrders = orderDAO.getAllOrders();
-        Order2 firstOrder = listOfAllOrders.get(0);
-        Order2 secondOrder = listOfAllOrders.get(1);
+        List<Order> listOfAllOrders = orderDAO.getAllOrders();
+        Order firstOrder = listOfAllOrders.get(0);
+        Order secondOrder = listOfAllOrders.get(1);
         final int quantityOfFirstOrderAfterExecution = 40;//how should it be written ???
         final int quantityOfSecondOrderAfterExecution = 0;//
 

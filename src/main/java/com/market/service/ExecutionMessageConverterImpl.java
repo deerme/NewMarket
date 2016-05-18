@@ -1,13 +1,13 @@
 package com.market.service;
 
-import com.market.model.Execution2;
+import com.market.model.Execution;
 
 /**
  * Created by pizmak on 2016-05-17.
  */
 public class ExecutionMessageConverterImpl implements ExecutionMessageConverter {
     @Override
-    public String convertMessageAboutExecutionToFormatForSendingToQueue(Execution2 execution) {
+    public String convertMessageAboutExecutionToFormatForSendingToQueue(Execution execution) {
 //        if (1 == 1) {
 //            throw new GeneralException(null);
 //        }

@@ -8,16 +8,14 @@ import java.util.Optional;
 /**
  * Created by PBanasiak on 3/21/2016.
  */
-public class Execution2 {
+final public class Order {
     final private Optional<Integer> id;
-    final private int idBuyer;
-    final private int idSeller;
+    final private String type;
     final private int quantity;
 
-    public Execution2(Optional<Integer> id, int idBuyer, int idSeller, int quantity) {
+    public Order(Optional<Integer> id, String type, int quantity) {
         this.id = id;
-        this.idBuyer = idBuyer;
-        this.idSeller = idSeller;
+        this.type = type;
         this.quantity = quantity;
     }
 
@@ -25,12 +23,8 @@ public class Execution2 {
         return id;
     }
 
-    public int getIdBuyer() {
-        return idBuyer;
-    }
-
-    public int getIdSeller() {
-        return idSeller;
+    public String getType() {
+        return type;
     }
 
     public int getQuantity() {
@@ -41,24 +35,22 @@ public class Execution2 {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Execution2 that = (Execution2) o;
-        return getIdBuyer() == that.getIdBuyer() &&
-                getIdSeller() == that.getIdSeller() &&
-                getQuantity() == that.getQuantity() &&
-                Objects.equal(getId(), that.getId());
+        Order order = (Order) o;
+        return getQuantity() == order.getQuantity() &&
+                Objects.equal(getId(), order.getId()) &&
+                Objects.equal(getType(), order.getType());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId(), getIdBuyer(), getIdSeller(), getQuantity());
+        return Objects.hashCode(getId(), getType(), getQuantity());
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("id", id)
-                .add("idBuyer", idBuyer)
-                .add("idSeller", idSeller)
+                .add("id", Optional.of(id))
+                .add("type", type)
                 .add("quantity", quantity)
                 .toString();
     }

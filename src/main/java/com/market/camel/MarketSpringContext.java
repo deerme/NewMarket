@@ -1,12 +1,10 @@
 package com.market.camel;
 
 import com.market.service.*;
-import com.market.web.MarketWebAppInitializer;
 import com.market.database.ExecutionDAO;
 import com.market.database.ExecutionDAOImpl;
 import com.market.database.OrderDAO;
 import com.market.database.OrderDAOImpl;
-import com.market.web.MainController;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spring.javaconfig.CamelConfiguration;
@@ -18,17 +16,13 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.JstlView;
 import javax.jms.ConnectionFactory;
 import javax.sql.DataSource;
 
 /**
  * Created by pizmak on 2016-05-17.
  */
-@EnableWebMvc
+
 @PropertySource("classpath:/jdbc.properties")
 @Configuration
 public class MarketSpringContext extends CamelConfiguration {
@@ -81,26 +75,6 @@ public class MarketSpringContext extends CamelConfiguration {
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         return new PropertySourcesPlaceholderConfigurer();
-    }
-
-    @Bean
-    public ViewResolver viewResolver() {
-        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-        viewResolver.setViewClass(JstlView.class);
-        viewResolver.setPrefix("/WEB-INF/views/");
-        viewResolver.setSuffix(".jsp");
-
-        return viewResolver;
-    }
-
-    @Bean(initMethod = "createProducerTemplateFromCamelContext")
-    public MainController mainController() {
-        return new MainController(orderDAO(),executionDAO());
-    }
-
-    @Bean
-    public MarketWebAppInitializer marketInitializer(){
-        return new MarketWebAppInitializer();
     }
 
     @Bean

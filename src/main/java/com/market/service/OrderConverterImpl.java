@@ -1,6 +1,6 @@
 package com.market.service;
 
-import com.market.model.Order2;
+import com.market.model.Order;
 
 import java.util.Optional;
 
@@ -9,9 +9,9 @@ import java.util.Optional;
  */
 public class OrderConverterImpl implements OrderConverter {
     @Override
-    public Order2 convert(String orderStr) {
+    public Order convert(String orderStr) {
         String[] splitStr = orderStr.split(" ");
-        Order2 order = new Order2(
+        Order order = new Order(
                 Optional.empty(),
                 splitStr[0].trim(),
                 Integer.valueOf(splitStr[1].trim())

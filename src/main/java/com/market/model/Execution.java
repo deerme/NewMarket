@@ -8,14 +8,16 @@ import java.util.Optional;
 /**
  * Created by PBanasiak on 3/21/2016.
  */
-final public class Order2 {
+public class Execution {
     final private Optional<Integer> id;
-    final private String type;
+    final private int idBuyer;
+    final private int idSeller;
     final private int quantity;
 
-    public Order2(Optional<Integer> id, String type, int quantity) {
+    public Execution(Optional<Integer> id, int idBuyer, int idSeller, int quantity) {
         this.id = id;
-        this.type = type;
+        this.idBuyer = idBuyer;
+        this.idSeller = idSeller;
         this.quantity = quantity;
     }
 
@@ -23,8 +25,12 @@ final public class Order2 {
         return id;
     }
 
-    public String getType() {
-        return type;
+    public int getIdBuyer() {
+        return idBuyer;
+    }
+
+    public int getIdSeller() {
+        return idSeller;
     }
 
     public int getQuantity() {
@@ -35,22 +41,24 @@ final public class Order2 {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Order2 order2 = (Order2) o;
-        return getQuantity() == order2.getQuantity() &&
-                Objects.equal(getId(), order2.getId()) &&
-                Objects.equal(getType(), order2.getType());
+        Execution that = (Execution) o;
+        return getIdBuyer() == that.getIdBuyer() &&
+                getIdSeller() == that.getIdSeller() &&
+                getQuantity() == that.getQuantity() &&
+                Objects.equal(getId(), that.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId(), getType(), getQuantity());
+        return Objects.hashCode(getId(), getIdBuyer(), getIdSeller(), getQuantity());
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("id", Optional.of(id))
-                .add("type", type)
+                .add("id", id)
+                .add("idBuyer", idBuyer)
+                .add("idSeller", idSeller)
                 .add("quantity", quantity)
                 .toString();
     }

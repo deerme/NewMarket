@@ -1,6 +1,6 @@
 package com.market.database;
 
-import com.market.model.Execution2;
+import com.market.model.Execution;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,8 +11,8 @@ import java.util.List;
 
 public interface ExecutionDAO {
    @Transactional
-   Execution2 saveExecution(Execution2 execution);
+   Execution saveExecution(Execution execution);
 
    @Transactional
-   List<Execution2> getListOfAllExecutions();
+   List<Execution> getListOfAllExecutions();
 }
