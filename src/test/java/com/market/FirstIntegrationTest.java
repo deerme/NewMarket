@@ -57,6 +57,10 @@ public class FirstIntegrationTest {
     @EndpointInject(uri = "mock:" + JMS_NEW_ORDERS)
     private MockEndpoint jmsStartPoint;
 
+    private ProducerTemplate producerTemplate;
+
+
+
     @Before
     public void cleanDataBase() throws Exception {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
@@ -77,11 +81,16 @@ public class FirstIntegrationTest {
         jmsStartPoint.reset();
     }
 
+    @Before
+    public void setUpProducerTemplate() throws Exception {
+        producerTemplate = camelContext.createProducerTemplate();
+        producerTemplate.start();
+    }
+
     @Test
     public void testOrderSaved() {
         Assert.assertEquals(0, orderDAO.getAllOrders().size());
 
-        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "SELL 147");
 
         List<Order> allOpenOrders = orderDAO.getAllOrders();
@@ -95,7 +104,6 @@ public class FirstIntegrationTest {
     public void testExecutionCreated() {
         Assert.assertEquals(0, orderDAO.getAllOrders().size());
 
-        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "BUY 20");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "BUY 35");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "BUY 75");
@@ -105,17 +113,12 @@ public class FirstIntegrationTest {
 
     @Test
     public void testExecutionSavedShouldDoOneExecution() throws InterruptedException {
-        //given
         Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
         jmsEndPoint.expectedMessageCount(1);
-//        jmsEndPoint.expectedBodiesReceived("---000");
 
-        //when
-        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 100");
 
-        //then
         List<Execution> listOfAllExecutions = executionDAO.getListOfAllExecutions();
         Assert.assertEquals(1,listOfAllExecutions.size());
         Execution execution = listOfAllExecutions.get(0);
@@ -124,29 +127,25 @@ public class FirstIntegrationTest {
         Assert.assertEquals(quantityOfExecution,execution.getQuantity());
 
         jmsEndPoint.assertIsSatisfied();
-//        Assert.assertEquals("ddd", jmsEndPoint.);
-//        jmsEndPoint.expectedBodyReceived();
-
     }
 
     @Test
     public void testExecutionShouldDoTwoExecutions(){
         Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
 
-        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 40");
 
-        List<Integer> listOfAllExecutions = executionDAO.getListOfAllExecutions()
+        List<Integer> listOfAllQuantitiesOfAllExecutions = executionDAO.getListOfAllExecutions()
                 .stream().map(e -> e.getQuantity()).collect(Collectors.toList());
-        Assert.assertEquals(2,listOfAllExecutions.size());
+        Assert.assertEquals(2,listOfAllQuantitiesOfAllExecutions.size());
 
         final int quantityOfFirstExecution = 80;
         final int quantityOfSecondExecution = 40;
 
-        Assert.assertTrue(listOfAllExecutions.contains(quantityOfFirstExecution));
-        Assert.assertTrue(listOfAllExecutions.contains(quantityOfSecondExecution));
+        Assert.assertTrue(listOfAllQuantitiesOfAllExecutions.contains(quantityOfFirstExecution));
+        Assert.assertTrue(listOfAllQuantitiesOfAllExecutions.contains(quantityOfSecondExecution));
     }
 
     @Test
@@ -154,20 +153,36 @@ public class FirstIntegrationTest {
         Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
         Assert.assertEquals(0,orderDAO.getAllOrders().size());
 
-        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
-        producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");//
-        producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");//
+        producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");
+        producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");
 
-        List<Order> listOfAllOrders = orderDAO.getAllOrders();
-        Order firstOrder = listOfAllOrders.get(0);
-        Order secondOrder = listOfAllOrders.get(1);
-        final int quantityOfFirstOrderAfterExecution = 40;//how should it be written ???
-        final int quantityOfSecondOrderAfterExecution = 0;//
+        List<Integer> listOfAllQuantitiesOfAllOrders = orderDAO.getAllOrders()
+                .stream().map(e->e.getQuantity()).collect(Collectors.toList());
 
-        Assert.assertEquals(quantityOfFirstOrderAfterExecution,firstOrder.getQuantity());
-        Assert.assertEquals(quantityOfSecondOrderAfterExecution,secondOrder.getQuantity());
+        final int quantityOfFirstOrderAfterExecution = 40;
+        final int quantityOfSecondOrderAfterExecution = 0;
+
+        Assert.assertTrue(listOfAllQuantitiesOfAllOrders.contains(quantityOfFirstOrderAfterExecution));
+        Assert.assertTrue(listOfAllQuantitiesOfAllOrders.contains(quantityOfSecondOrderAfterExecution));
 
     }
+
+    @Test
+    public void testCorrectnessMessageAboutExecution() throws InterruptedException {
+        Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
+        Assert.assertEquals(0,orderDAO.getAllOrders().size());
+
+        producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");
+        producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");
+
+        String templateOfGoodEndedMessageAboutExecutionWhichIsSentToJmsEndQueue="exec_id=Optional\\[[0-9]{1,}\\]sell_id=[0-9]{1,}buy_id=[0-9]{1,}qty=[0-9]{1,}";
+
+        jmsEndPoint.expectedMessageCount(1);
+        jmsEndPoint.message(0).body().regex(templateOfGoodEndedMessageAboutExecutionWhichIsSentToJmsEndQueue);
+        jmsEndPoint.assertIsSatisfied();
+
+    }
+
     @Configuration
     @Import({MarketSpringContext.class})
     public static class FirstIntegrationTestConfig {

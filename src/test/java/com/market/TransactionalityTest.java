@@ -4,7 +4,13 @@ import com.market.camel.MarketSpringContext;
 import com.market.database.ExecutionDAO;
 import com.market.database.OrderDAO;
 import com.market.exception.GeneralException;
+import com.market.model.Execution;
+import com.market.model.Order;
+import com.market.service.ExecutionCreator;
+import com.market.service.ExecutionCreatorImpl;
 import com.market.service.ExecutionMessageConverter;
+import com.market.service.ExecutionMessageConverterImpl;
+import exceptions.ExceptionFromOrderDao;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
@@ -36,7 +42,7 @@ import static com.market.camel.MarketRouteBuilder.*;
 /**
  * Created by pizmak on 2016-05-17.
  */
-@Ignore
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TransactionalityTest.FirstIntegrationTestConfig.class, loader = AnnotationConfigContextLoader.class)
 public class TransactionalityTest {
@@ -54,6 +60,8 @@ public class TransactionalityTest {
     private ExecutionDAO executionDAO;
     @Autowired
     private ExecutionMessageConverter executionMessageConverter;
+    @Autowired
+    private ExecutionCreator executionCreator;
 
     @EndpointInject(uri = "mock:" + JMS_EXECUTION_INFO)
     private MockEndpoint jmsEndPoint;
@@ -62,53 +70,59 @@ public class TransactionalityTest {
     private MockEndpoint jmsStartPoint;
 
     @Before
-    public void cleanDataBase() throws Exception {
+    public void cleanDatabase() throws Exception {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
-        camelContext.getRouteDefinition(MAIN_ROUTE_ENTRY).adviceWith(camelContext, new AdviceWithRouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                mockEndpointsAndSkip(JMS_EXECUTION_INFO,JMS_NEW_ORDERS);
-            }
-        });
-        jmsEndPoint.reset();
-        camelContext.getRouteDefinition(WEB_ROUTE_ENTRY).adviceWith(camelContext, new AdviceWithRouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                mockEndpointsAndSkip(JMS_NEW_ORDERS);
-            }
-        });
-        jmsStartPoint.reset();
+//        camelContext.getRouteDefinition(MAIN_ROUTE_ENTRY).adviceWith(camelContext, new AdviceWithRouteBuilder() {
+//            @Override
+//            public void configure() throws Exception {
+//                mockEndpointsAndSkip(JMS_EXECUTION_INFO);
+//            }
+//        });
+//        jmsEndPoint.reset();
+
+//        camelContext.getRouteDefinition(WEB_ROUTE_ENTRY).adviceWith(camelContext, new AdviceWithRouteBuilder() {
+//            @Override
+//            public void configure() throws Exception {
+//                mockEndpointsAndSkip(JMS_NEW_ORDERS);
+//            }
+//        });
+//        jmsStartPoint.reset();
     }
 
     @Test
     public void testOrderSaved() {
         Assert.assertEquals(0, orderDAO.getAllOrders().size());
         Assert.assertEquals(0, executionDAO.getListOfAllExecutions().size());
-        GeneralException exception = new GeneralException(null);
-        Mockito.when(executionMessageConverter.convertMessageAboutExecutionToFormatForSendingToQueue(Mockito.any()))
+        ExceptionFromOrderDao exception = new ExceptionFromOrderDao("transactionException");
+        Mockito.when(executionMessageConverter.convertMessageAboutExecutionToFormatForSendingToQueue(Mockito.any(Execution.class)))
                 .thenThrow(exception);
+     //   Mockito.when(executionCreator.process(Mockito.any(Order.class))).thenThrow(exception);
 
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
-        producerTemplate.sendBody(JMS_NEW_ORDERS, "SELL 1");
+
         try {
+            producerTemplate.sendBody(JMS_NEW_ORDERS, "SELL 1");
             producerTemplate.sendBody(JMS_NEW_ORDERS, "BUY 1");
         } catch (Exception ex) {
-//            Assert.assertTrue(exception.equals(ex));
+          //  Assert.assertTrue(ex.getId()==20);
+//            Assert.assertTrue(ex.getMessage().contains("transactionException"));
             Assert.assertEquals(0, orderDAO.getAllOrders().size());
             Assert.assertEquals(0, executionDAO.getListOfAllExecutions().size());
+            System.out.println("In catch");
             return;
         }
-        Assert.assertEquals(0, orderDAO.getAllOrders().size());
-        Assert.assertEquals(0, executionDAO.getListOfAllExecutions().size());
+//        Assert.assertEquals(0, orderDAO.getAllOrders().size());
+//        Assert.assertEquals(0, executionDAO.getListOfAllExecutions().size());
         Assert.fail();
     }
 
     @Configuration
-    @Import({MarketSpringContext.class})
+    @Import(MarketSpringContext.class)
     public static class FirstIntegrationTestConfig {
         public FirstIntegrationTestConfig() {
         }
 
+        @Primary
         @Bean
         public DataSource dataSource() {
             return new EmbeddedDatabaseBuilder()
@@ -122,11 +136,17 @@ public class TransactionalityTest {
             return new JdbcTemplate(dataSource());
         }
 
-        @Bean
         @Primary
+        @Bean
         public ExecutionMessageConverter executionMessageConverter() {
-            return Mockito.mock(ExecutionMessageConverter.class);
+            return Mockito.mock(ExecutionMessageConverterImpl.class);
         }
+
+//        @Primary
+//        @Bean
+//        public ExecutionCreator executionCreator(){
+//            return  Mockito.mock(ExecutionCreatorImpl.class);
+//        }
 
     }
 }

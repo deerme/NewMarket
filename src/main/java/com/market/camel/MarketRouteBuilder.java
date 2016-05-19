@@ -9,6 +9,8 @@ import com.market.database.OrderDAO;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
+
 /**
  * Created by pizmak on 2016-05-17.
  */
@@ -31,11 +33,12 @@ public class MarketRouteBuilder extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+        onException(IOException.class)
+                .maximumRedeliveries(0).redeliveryDelay(0);
+
         from(MAIN_ROUTE_ENTRY)
                 .id(MAIN_ROUTE_ENTRY)
                 .transacted()
-//                .onException(Throwable.class).handled(false)
-               // .markRollbackOnly()
                 .bean(orderConverter)
                 .bean(orderDAO, OrderDAO.SAVE_ORDER_METHOD_NAME)
                 .bean(executionCreator)

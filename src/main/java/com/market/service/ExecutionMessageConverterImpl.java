@@ -12,13 +12,13 @@ public class ExecutionMessageConverterImpl implements ExecutionMessageConverter 
 //            throw new GeneralException(null);
 //        }
         return new StringBuilder()
-                   .append("exec_id= ")
+                   .append("exec_id=")
                    .append(execution.getId())
-                   .append("sell_id= ")
+                   .append("sell_id=")
                    .append(execution.getIdSeller())
-                   .append("buy_id= ")
+                   .append("buy_id=")
                    .append(execution.getIdSeller())
-                   .append("qty= ")
+                   .append("qty=")
                    .append(execution.getQuantity())
                    .toString() ;
     }
