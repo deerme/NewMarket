@@ -1,6 +1,6 @@
 package com.market.web;
 
-import com.market.camel.MarketSpringContext;
+import com.market.camel.DbSpringContext;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -15,7 +15,7 @@ public class MarketWebAppInitializer implements WebApplicationInitializer {
 
     public void onStartup(ServletContext container) throws ServletException {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.register(MarketWebSpringContext.class);
+        context.register(MarketWebSpringContext.class, DbSpringContext.class);
         context.setServletContext(container);
 
         ServletRegistration.Dynamic servlet = container.addServlet("dispatcher", new DispatcherServlet(context));

@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * Created by pizmak on 2016-05-17.
  */
+@Transactional
 public interface OrderDAO {
     final String SAVE_ORDER_METHOD_NAME = "saveOrder";
     final String UPDATE_ORDER_AFTER_EXECUTION_METHOD_NAME="updateQuantityOfOrdersAfterDoneExecution";

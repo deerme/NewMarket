@@ -26,6 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.jdbc.JdbcTestUtils;
+
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -164,6 +165,20 @@ public class FirstIntegrationTest {
 
         Assert.assertTrue(listOfAllQuantitiesOfAllOrders.contains(quantityOfFirstOrderAfterExecution));
         Assert.assertTrue(listOfAllQuantitiesOfAllOrders.contains(quantityOfSecondOrderAfterExecution));
+
+    }
+
+    @Test
+    public void testCorrectnessDoingMessageAboutExecutionShouldNoSendMessageToJmsEndQueue() throws InterruptedException {
+        Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
+        Assert.assertEquals(0,orderDAO.getAllOrders().size());
+
+        producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 120");
+        producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");
+
+        jmsEndPoint.expectedMessageCount(0);
+
+        jmsEndPoint.assertIsSatisfied();
 
     }
 

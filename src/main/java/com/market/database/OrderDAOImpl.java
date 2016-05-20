@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
@@ -18,6 +19,7 @@ import java.util.Optional;
 /**
  * Created by pizmak on 2016-05-17.
  */
+@Transactional
 public class OrderDAOImpl implements OrderDAO {
     private JdbcTemplate jdbcTemplate;
     private Logger logger = LoggerFactory.getLogger("auditLogger");
@@ -27,6 +29,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
+    @Transactional
     public Order saveOrder(Order order) {
         final String insertSql = "INSERT INTO ORDERINMARKET(TYPE,QUANTITY) VALUES(?,?);";
 
@@ -51,6 +54,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
+    @Transactional
     public List<Order> getAllOpenOrdersByType(String type) {
         final String sqlGetAllOpenOrdersQuery =
                 "SELECT * FROM orderinmarket WHERE quantity > 0 and type = ?";
@@ -66,6 +70,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
+    @Transactional
     public Execution updateQuantityOfOrdersAfterDoneExecution(Execution execution) {
         final String sqlUpdateQuantityOfOrderAfterExecution="UPDATE orderinmarket SET quantity=quantity-? WHERE ID=?";
 
@@ -79,6 +84,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
+    @Transactional
     public List<Order> getAllOrders() {
         final String sqlGetAllOrdersQuery = "SELECT * FROM orderinmarket;";
 
@@ -90,6 +96,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
+    @Transactional
     public int getQuantityOfOrderById(int id) {
         final String sqlGetAllOpenOrdersQuery = "SELECT quantity FROM orderinmarket WHERE id= ?;";
 
