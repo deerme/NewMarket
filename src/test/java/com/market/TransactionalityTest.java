@@ -64,11 +64,9 @@ public class TransactionalityTest {
     @EndpointInject(uri = "mock:" + JMS_NEW_ORDERS)
     private MockEndpoint jmsStartPoint;
 
-    private Exception e;
 
     @Before
     public void cleanDatabase() throws Exception {
-        e = new ExceptionFromOrderDao("testing");
         JdbcTestUtils.deleteFromTables(jdbcTemplate, NAME_OF_TABLE_WITH_EXECUTIONS,NAME_OF_TABLE_WITH_ORDERS);
 
         camelContext.getRouteDefinition(MAIN_ROUTE_ENTRY).adviceWith(camelContext, new AdviceWithRouteBuilder() {
@@ -94,10 +92,10 @@ public class TransactionalityTest {
     public void testExecutionShouldBeRoledBack() {
         Assert.assertEquals(0, orderDAO.getAllOrders().size());
         Assert.assertEquals(0, executionDAO.getListOfAllExecutions().size());
+
         ExceptionFromOrderDao exception = new ExceptionFromOrderDao("transactionException");
         Mockito.when(executionMessageConverter.convertMessageAboutExecutionToFormatForSendingToQueue(Mockito.any()))
                 .thenThrow(exception);
-//        Mockito.when(executionCreator.process(Mockito.any(Order.class))).thenThrow(exception);
 
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
 
@@ -120,7 +118,6 @@ public class TransactionalityTest {
         public FirstIntegrationTestConfig() {
         }
 
-      //  @Primary
         @Bean
         public DataSource dataSource() {
             return new EmbeddedDatabaseBuilder()
@@ -139,12 +136,6 @@ public class TransactionalityTest {
         public ExecutionMessageConverter executionMessageConverter() {
             return Mockito.mock(ExecutionMessageConverter.class);
         }
-
-//        @Primary
-//        @Bean
-//        public ExecutionCreator executionCreator(){
-//            return  Mockito.mock(ExecutionCreatorImpl.class);
-//        }
 
     }
 }

@@ -33,11 +33,6 @@ public class MainController {
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
     private ProducerTemplate producerTemplate;
 
-//    public MainController(OldOrderDAO oldOrderDAO, OldExecutionDAO oldExecutionDAO) {
-//        this.oldOrderDAO = oldOrderDAO;
-//        this.oldExecutionDAO = oldExecutionDAO;
-//    }
-
     public MainController(OrderDAO orderDAO, ExecutionDAO executionDAO) {
          this.orderDAO = orderDAO;
          this.executionDAO = executionDAO;

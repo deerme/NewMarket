@@ -1,23 +1,20 @@
 package com.market.camel;
 
-
 import com.market.service.ExecutionCreator;
 import com.market.service.ExecutionMessageConverter;
 import com.market.service.OrderConverter;
 import com.market.database.ExecutionDAO;
 import com.market.database.OrderDAO;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spring.SpringRouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import javax.sql.DataSource;
-import java.io.IOException;
+
 
 /**
  * Created by pizmak on 2016-05-17.
  */
+@EnableWebMvc
 public class MarketRouteBuilder extends SpringRouteBuilder {
     public static final  String MAIN_ROUTE_ENTRY = "direct:mainRoute";
     public static final  String JMS_EXECUTION_INFO = "jms:testExecutionsInformationQueue";
