@@ -3,9 +3,10 @@ package com.market;
 import com.market.camel.MarketSpringContext;
 import com.market.database.ExecutionDAO;
 import com.market.database.OrderDAO;
-import com.market.model.Execution;
-import com.market.service.ExecutionCreator;
-import com.market.service.ExecutionMessageConverter;
+import com.market.service.camel.ExecutionCreator;
+import com.market.service.camel.ExecutionMessageConverter;
+import com.market.service.myBatis.ExecutionDAOService;
+import com.market.service.myBatis.OrderDAOService;
 import exceptions.ExceptionFromOrderDao;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.ProducerTemplate;
@@ -14,6 +15,7 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ModelCamelContext;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -48,15 +50,15 @@ public class TransactionalityTest {
     private ModelCamelContext camelContext;
 
     @Autowired
-    private OrderDAO orderDAO;
-    @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private ExecutionDAO executionDAO;
     @Autowired
     private ExecutionMessageConverter executionMessageConverter;
     @Autowired
     private ExecutionCreator executionCreator;
+    @Autowired
+    private OrderDAOService orderDAOService;
+    @Autowired
+    private ExecutionDAOService executionDAOService;
 
     @EndpointInject(uri = "mock:" + JMS_EXECUTION_INFO)
     private MockEndpoint jmsEndPoint;
@@ -73,7 +75,6 @@ public class TransactionalityTest {
             @Override
             public void configure() throws Exception {
                 mockEndpointsAndSkip(JMS_EXECUTION_INFO);
-//                interceptSendToEndpoint("mock:jms:testExecutionsInformationQueue").throwException(e);
             }
 
     });
@@ -85,13 +86,12 @@ public class TransactionalityTest {
             }
         });
         jmsStartPoint.reset();
-
     }
 
     @Test
     public void testExecutionShouldBeRoledBack() {
-        Assert.assertEquals(0, orderDAO.getAllOrders().size());
-        Assert.assertEquals(0, executionDAO.getListOfAllExecutions().size());
+        Assert.assertEquals(0, orderDAOService.getListAllOrders().size());
+        Assert.assertEquals(0, executionDAOService.getAllExecutions().size());
 
         ExceptionFromOrderDao exception = new ExceptionFromOrderDao("transactionException");
         Mockito.when(executionMessageConverter.convertMessageAboutExecutionToFormatForSendingToQueue(Mockito.any()))
@@ -104,8 +104,8 @@ public class TransactionalityTest {
             producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "BUY 1");
         } catch (Exception ex) {
             Assert.assertTrue(ex.getCause().getCause().equals(exception));
-            Assert.assertEquals(1, orderDAO.getAllOrders().size());
-            Assert.assertEquals(0, executionDAO.getListOfAllExecutions().size());
+            Assert.assertEquals(1, orderDAOService.getListAllOrders().size());
+            Assert.assertEquals(0, executionDAOService.getAllExecutions().size());
             System.out.println("In catch");
             return;
         }

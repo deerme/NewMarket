@@ -1,29 +1,30 @@
-package com.market.service;
+package com.market.service.camel;
 
 import com.market.database.OrderDAO;
-import com.market.model.Execution;
-import com.market.model.Order;
+import com.market.model.standard.Execution;
+import com.market.model.standard.Order;
+import com.market.service.myBatis.OrderDAOService;
 import org.apache.commons.lang3.tuple.Pair;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import static com.market.service.Constants.ORD_TYPE_BUY;
-import static com.market.service.Constants.ORD_TYPE_SELL;
+import static com.market.service.camel.Constants.ORD_TYPE_BUY;
+import static com.market.service.camel.Constants.ORD_TYPE_SELL;
 
 /**
  * Created by pizmak on 2016-05-17.
  */
 public class ExecutionCreatorImpl implements ExecutionCreator {
-    private OrderDAO orderDAO;
+    private OrderDAOService orderDAOService;
 
-    public ExecutionCreatorImpl(OrderDAO orderDAO) {
-        this.orderDAO = orderDAO;
+    public ExecutionCreatorImpl(OrderDAOService orderDAOService) {
+        this.orderDAOService = orderDAOService;
     }
 
     @Override
     public List<Execution> process(Order order) {
-        List<Order> openedOrdersOrdered = orderDAO.getAllOpenOrdersByType(inverseType(order.getType()));
+        List<Order> openedOrdersOrdered = orderDAOService.getListAllOrdersByType(inverseType(order.getType()));
         Collections.sort(
                 openedOrdersOrdered,
                 (o1, o2) -> o1.getQuantity() < o2.getQuantity() ? -1

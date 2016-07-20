@@ -1,7 +1,7 @@
 package com.market.database;
 
-import com.market.model.Execution;
-import com.market.model.Order;
+import com.market.model.standard.Execution;
+import com.market.model.standard.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;

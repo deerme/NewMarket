@@ -1,4 +1,4 @@
-package com.market.service;
+package com.market.service.camel;
 
 /**
  * Created by pizmak on 2016-05-17.

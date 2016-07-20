@@ -3,8 +3,14 @@ package com.market;
 import com.market.camel.MarketSpringContext;
 import com.market.database.ExecutionDAO;
 import com.market.database.OrderDAO;
-import com.market.model.Execution;
-import com.market.model.Order;
+import com.market.mappers.ExecutionMapper;
+import com.market.mappers.OrderMapper;
+import com.market.model.changed.ExecutionTemp;
+import com.market.model.changed.OrderTemp;
+import com.market.model.standard.Execution;
+import com.market.model.standard.Order;
+import com.market.service.myBatis.ExecutionDAOService;
+import com.market.service.myBatis.OrderDAOService;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
@@ -12,6 +18,7 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ModelCamelContext;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +35,15 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import static com.market.camel.MarketRouteBuilder.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by pizmak on 2016-05-17.
  */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = FirstIntegrationTest.FirstIntegrationTestConfig.class, loader = AnnotationConfigContextLoader.class)
 public class FirstIntegrationTest {
@@ -44,11 +54,13 @@ public class FirstIntegrationTest {
     private ModelCamelContext camelContext;
 
     @Autowired
-    private OrderDAO orderDAO;
-    @Autowired
     private JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private ExecutionDAO executionDAO;
+    private OrderDAOService orderDAOService;
+
+    @Autowired
+    private ExecutionDAOService executionDAOService;
 
     @EndpointInject(uri = "mock:" + JMS_EXECUTION_INFO)
     private MockEndpoint jmsEndPoint;
@@ -58,7 +70,10 @@ public class FirstIntegrationTest {
 
     private ProducerTemplate producerTemplate;
 
-
+    @Autowired
+    OrderMapper orderMapper;
+    @Autowired
+    ExecutionMapper executionMapper;
 
     @Before
     public void cleanDataBase() throws Exception {
@@ -86,13 +101,14 @@ public class FirstIntegrationTest {
         producerTemplate.start();
     }
 
+
     @Test
     public void testOrderSaved() {
-        Assert.assertEquals(0, orderDAO.getAllOrders().size());
+        Assert.assertEquals(0, orderDAOService.getListAllOpenOrders().size());
 
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "SELL 147");
 
-        List<Order> allOpenOrders = orderDAO.getAllOrders();
+        List<Order> allOpenOrders = orderDAOService.getListAllOpenOrders();
         Assert.assertEquals(1,  allOpenOrders.size());
         Order order = allOpenOrders.get(0);
         Assert.assertEquals("SELL", order.getType());
@@ -100,25 +116,28 @@ public class FirstIntegrationTest {
     }
 
     @Test
-    public void testExecutionCreated() {
-        Assert.assertEquals(0, orderDAO.getAllOrders().size());
+    public void testExecutionCreated() throws InterruptedException {
+        Assert.assertEquals(0, orderDAOService.getListAllOpenOrders().size());
 
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "BUY 20");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "BUY 35");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "BUY 75");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "BUY 60");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY, "SELL 100");
+
+        jmsEndPoint.expectedMinimumMessageCount(1);
+        jmsEndPoint.assertIsSatisfied();
     }
 
     @Test
     public void testExecutionSavedShouldDoOneExecution() throws InterruptedException {
-        Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
+        Assert.assertEquals(0,executionDAOService.getAllExecutions().size());
         jmsEndPoint.expectedMessageCount(1);
 
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 100");
 
-        List<Execution> listOfAllExecutions = executionDAO.getListOfAllExecutions();
+        List<Execution> listOfAllExecutions = executionDAOService.getAllExecutions();
         Assert.assertEquals(1,listOfAllExecutions.size());
         Execution execution = listOfAllExecutions.get(0);
 
@@ -130,46 +149,50 @@ public class FirstIntegrationTest {
 
     @Test
     public void testExecutionShouldDoTwoExecutions(){
-        Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
+        Assert.assertEquals(0,executionDAOService.getAllExecutions().size());
 
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 40");
 
-        List<Integer> listOfAllQuantitiesOfAllExecutions = executionDAO.getListOfAllExecutions()
+        List<Integer> listOfAllQuantitiesOfAllExecutions = executionDAOService.getAllExecutions()
                 .stream().map(e -> e.getQuantity()).collect(Collectors.toList());
         Assert.assertEquals(2,listOfAllQuantitiesOfAllExecutions.size());
 
         final int quantityOfFirstExecution = 80;
         final int quantityOfSecondExecution = 40;
 
-        Assert.assertTrue(listOfAllQuantitiesOfAllExecutions.contains(quantityOfFirstExecution));
-        Assert.assertTrue(listOfAllQuantitiesOfAllExecutions.contains(quantityOfSecondExecution));
+        assertTrue(listOfAllQuantitiesOfAllExecutions.contains(quantityOfFirstExecution));
+        assertTrue(listOfAllQuantitiesOfAllExecutions.contains(quantityOfSecondExecution));
     }
 
     @Test
-    public void testUpdatingQuantityOfMachingOrdersAfterDoneExecution(){
-        Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
-        Assert.assertEquals(0,orderDAO.getAllOrders().size());
+    public void testUpdatingQuantityOfMachingOrdersAfterDoneExecution() throws InterruptedException {
+        Assert.assertEquals(0,executionDAOService.getAllExecutions().size());
+        Assert.assertEquals(0,orderDAOService.getListAllOrders().size());
 
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");
 
-        List<Integer> listOfAllQuantitiesOfAllOrders = orderDAO.getAllOrders()
+
+        List<Integer> listOfAllQuantitiesOfAllOrders = orderDAOService.getListAllOrders()
                 .stream().map(e->e.getQuantity()).collect(Collectors.toList());
+
+
+
 
         final int quantityOfFirstOrderAfterExecution = 40;
         final int quantityOfSecondOrderAfterExecution = 0;
-
+        System.out.println("AAA"+listOfAllQuantitiesOfAllOrders);
         Assert.assertTrue(listOfAllQuantitiesOfAllOrders.contains(quantityOfFirstOrderAfterExecution));
-        Assert.assertTrue(listOfAllQuantitiesOfAllOrders.contains(quantityOfSecondOrderAfterExecution));
+        assertTrue(listOfAllQuantitiesOfAllOrders.contains(quantityOfSecondOrderAfterExecution));
 
     }
 
     @Test
     public void testCorrectnessDoingMessageAboutExecutionShouldNoSendMessageToJmsEndQueue() throws InterruptedException {
-        Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
-        Assert.assertEquals(0,orderDAO.getAllOrders().size());
+        Assert.assertEquals(0,executionDAOService.getAllExecutions().size());
+        Assert.assertEquals(0,orderDAOService.getListAllOpenOrders().size());
 
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 120");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");
@@ -182,8 +205,8 @@ public class FirstIntegrationTest {
 
     @Test
     public void testCorrectnessMessageAboutExecution() throws InterruptedException {
-        Assert.assertEquals(0,executionDAO.getListOfAllExecutions().size());
-        Assert.assertEquals(0,orderDAO.getAllOrders().size());
+        Assert.assertEquals(0,executionDAOService.getAllExecutions().size());
+        Assert.assertEquals(0,orderDAOService.getListAllOpenOrders().size());
 
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"BUY 120");
         producerTemplate.sendBody(MAIN_ROUTE_ENTRY,"SELL 80");

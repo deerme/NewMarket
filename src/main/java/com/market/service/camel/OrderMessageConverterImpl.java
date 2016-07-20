@@ -1,13 +1,13 @@
-package com.market.service;
+package com.market.service.camel;
 
-import com.market.model.Order;
+import com.market.model.standard.Order;
 
 import java.util.Optional;
 
 /**
  * Created by pizmak on 2016-05-17.
  */
-public class OrderConverterImpl implements OrderConverter {
+public class OrderMessageConverterImpl implements OrderMessageConverter {
     @Override
     public Order convert(String orderStr) {
         String[] splitStr = orderStr.split(" ");

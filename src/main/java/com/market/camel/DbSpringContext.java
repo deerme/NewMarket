@@ -1,11 +1,17 @@
 package com.market.camel;
 
 import org.apache.camel.spring.javaconfig.CamelConfiguration;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import javax.sql.DataSource;
 
 /**
  * Created by pizmak on 2016-05-17.
@@ -13,6 +19,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @PropertySource("classpath:/jdbc.properties")
 @Configuration
+@MapperScan(basePackages = "com.market.mappers")
 public class DbSpringContext extends CamelConfiguration {
     @Bean
     public DriverManagerDataSource dataSource() {
@@ -28,6 +35,4 @@ public class DbSpringContext extends CamelConfiguration {
         dataSource.setPassword("");
         return  dataSource;
     }
-
-
 }

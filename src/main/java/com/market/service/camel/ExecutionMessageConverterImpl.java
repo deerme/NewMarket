@@ -1,6 +1,6 @@
-package com.market.service;
+package com.market.service.camel;
 
-import com.market.model.Execution;
+import com.market.model.standard.Execution;
 
 /**
  * Created by pizmak on 2016-05-17.
@@ -8,9 +8,6 @@ import com.market.model.Execution;
 public class ExecutionMessageConverterImpl implements ExecutionMessageConverter {
     @Override
     public String convertMessageAboutExecutionToFormatForSendingToQueue(Execution execution) {
-//        if (1 == 1) {
-//            throw new GeneralException(null);
-//        }
         return new StringBuilder()
                    .append("exec_id=")
                    .append(execution.getId())

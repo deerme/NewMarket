@@ -4,9 +4,9 @@ package com.market.web;
  * Created by pizmak on 2016-04-07.
  */
 
-import com.market.model.Execution;
+import com.market.model.standard.Execution;
 import com.market.database.ExecutionDAO;
-import com.market.model.Order;
+import com.market.model.standard.Order;
 import com.market.database.OrderDAO;
 import com.market.exception.GeneralException;
 import org.apache.camel.CamelContext;

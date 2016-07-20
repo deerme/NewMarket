@@ -1,7 +1,7 @@
-package com.market.service;
+package com.market.service.camel;
 
-import com.market.model.Execution;
-import com.market.model.Order;
+import com.market.model.standard.Execution;
+import com.market.model.standard.Order;
 
 import java.util.List;
 
