@@ -51,7 +51,7 @@ public class TestConfiguration {
 
     @Bean
     public ConnectionFactory connectionFactory(){
-        return new ActiveMQConnectionFactory("tcp://localhost:61616");
+        return new ActiveMQConnectionFactory("vm://localhost");
     }
 
     @Bean
@@ -90,13 +90,13 @@ public class TestConfiguration {
     }
 
     @Bean
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+    public SqlSessionFactory sqlSessionFactory() throws Exception {
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource);
+        sessionFactory.setDataSource(dataSource());
 
         return sessionFactory.getObject();
     }
-    @Primary
+//    @Primary
     @Bean
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()

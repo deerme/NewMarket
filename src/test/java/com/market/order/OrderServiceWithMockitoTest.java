@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 /**
  * Created by pizmak on 2016-07-20.
  */
-@Ignore
+
 @RunWith(MockitoJUnitRunner.class)
 public class OrderServiceWithMockitoTest {
     private static final String TYPE_147 = "type147";
@@ -36,6 +36,7 @@ public class OrderServiceWithMockitoTest {
 
     private Order orderToAdd;
     private OrderTemp tmpOrder;
+    private Order orderAfterAdd;
 
     @Mock
     private OrderMapper orderMapper;
@@ -52,12 +53,17 @@ public class OrderServiceWithMockitoTest {
         //given
         orderToAdd = new Order(Optional.empty(), TYPE_147, QUANTITY_123);
         tmpOrder = new OrderTemp(DEFAULT_ID, TYPE_147, QUANTITY_123);
+        orderAfterAdd = new Order(Optional.of(GENERATED_ID),TYPE_147,QUANTITY_123);
+
     }
 
     @Test
     public void testAddOrder() {
         when(orderConverter.createOrderTempFromOrder(Matchers.refEq(orderToAdd)))
                 .thenReturn(tmpOrder);
+
+        when(orderConverter.createOrderFromOrderTemp(Matchers.refEq(tmpOrder)))
+                .thenReturn(orderAfterAdd);
 
         when(orderMapper.addOrderTemp(Matchers.refEq(tmpOrder)))
                 .thenAnswer(new Answer<Integer>() {
@@ -70,8 +76,7 @@ public class OrderServiceWithMockitoTest {
                 });
 
         //when
-        int newId = orderDAOService.addOrder(orderToAdd).getId().get();
-
+       int newId = orderDAOService.addOrder(orderToAdd).getId().get();
         //then
         ArgumentCaptor<Order> argument1 = ArgumentCaptor.forClass(Order.class);
         verify(orderConverter).createOrderTempFromOrder(argument1.capture());
@@ -95,30 +100,31 @@ public class OrderServiceWithMockitoTest {
         when(orderConverter.createOrderTempFromOrder(Matchers.refEq(orderToAdd)))
                 .thenReturn(tmpOrder);
 
+        when(orderConverter.createOrderFromOrderTemp(Matchers.refEq(tmpOrder)))
+                .thenReturn(orderAfterAdd);
+
         when(orderMapper.addOrderTemp(Matchers.refEq(tmpOrder)))
                 .thenAnswer(new Answer<Integer>() {
                     @Override
                     public Integer answer(InvocationOnMock invocationOnMock) throws Throwable {
                         OrderTemp arg = (OrderTemp) invocationOnMock.getArguments()[0];
                         arg.setId(GENERATED_ID);
+                        System.out.println(arg);
                         return 0;
                     }
                 });
+
         Order order = orderDAOService.addOrder(orderToAdd);
 
-        int newId = order.getId().get();
-
+        
         inOrder.verify(orderConverter).createOrderTempFromOrder(orderToAdd);
         inOrder.verify(orderMapper).addOrderTemp(tmpOrder);
 
 
         verify(orderConverter, never()).createOrderListFromOrderTempList(anyList());
-        verify(orderConverter, never()).createOrderFromOrderTemp(any(OrderTemp.class));
         verify(orderMapper, never()).getOrderTemp(anyInt());
         verify(orderMapper, never()).getAllTempOrders();
         verify(orderMapper, never()).updateOrder(any(OrderTemp.class));
-
-        verify(orderConverter, only()).createOrderTempFromOrder(any(Order.class));
         verify(orderMapper, only()).addOrderTemp(any(OrderTemp.class));
     }
 

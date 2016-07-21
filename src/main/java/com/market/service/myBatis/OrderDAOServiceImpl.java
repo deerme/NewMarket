@@ -29,7 +29,7 @@ public class OrderDAOServiceImpl implements OrderDAOService {
         OrderTemp orderTemp = orderConverter.createOrderTempFromOrder(orderToAdd);
         orderMapper.addOrderTemp(orderTemp);
 
-        logger.info("Added order to database.Auto-generated id: " + orderTemp.getQuantity() +" Type of order: "+orderToAdd.getType()+" Quantity of order: " +orderTemp.getQuantity());
+        logger.info("Added order to database.Auto-generated id: " + orderTemp.getId() +" Type of order: "+orderToAdd.getType()+" Quantity of order: " +orderTemp.getQuantity());
 
         return orderConverter.createOrderFromOrderTemp(orderTemp);
     }
