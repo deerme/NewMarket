@@ -9,7 +9,9 @@ import com.market.model.changed.OrderTemp;
 import com.market.model.standard.Execution;
 import com.market.model.standard.Order;
 import com.market.service.myBatis.ExecutionDAOService;
+import com.market.service.myBatis.ExecutionDAOServiceImpl;
 import com.market.service.myBatis.OrderDAOService;
+import com.market.service.myBatis.OrderDAOServiceImpl;
 import com.market.service.myBatis.converters.ExecutionConverter;
 import com.market.service.myBatis.converters.OrderConverter;
 import org.junit.Ignore;
@@ -37,7 +39,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by pizmak on 2016-07-20.
  */
-@Ignore
+
 @RunWith(MockitoJUnitRunner.class)
 @ContextConfiguration(classes = TestConfiguration.class, loader = AnnotationConfigContextLoader.class)
 public class ExecutionServiceWithMockitoTest {
@@ -63,7 +65,7 @@ public class ExecutionServiceWithMockitoTest {
     private ExecutionConverter executionConverter;
 
     @InjectMocks
-    private ExecutionDAOService executionDAOService;
+    private ExecutionDAOServiceImpl executionDAOService;
 
     @Mock
     private OrderMapper orderMapper;
@@ -72,20 +74,25 @@ public class ExecutionServiceWithMockitoTest {
     private OrderConverter orderConverter;
 
     @InjectMocks
-    private OrderDAOService orderDAOService;
+    private OrderDAOServiceImpl orderDAOService;
 
 
     @Test
     public void testAddExecution() {
         Order buyOrderToAdd = new Order(Optional.empty(), BUY_ORDER_TYPE, BUY_ORDER_QUANTITY);
         OrderTemp buyOrderTemp = new OrderTemp(DEFAULT_ID, BUY_ORDER_TYPE, BUY_ORDER_QUANTITY);
+        Order buyOrderAfterAdd = new Order(Optional.of(BUY_ORDER_GENERATED_ID), BUY_ORDER_TYPE, BUY_ORDER_QUANTITY);
 
         Order sellOrderToAdd = new Order(Optional.empty(), SELL_ORDER_TYPE, SELL_ORDER_QUANTITY);
         OrderTemp sellOrderTemp = new OrderTemp(DEFAULT_ID, SELL_ORDER_TYPE, SELL_ORDER_QUANTITY);
+        Order sellOrderAfterAdd = new Order(Optional.of(SELL_ORDER_GENERATED_ID), SELL_ORDER_TYPE, SELL_ORDER_QUANTITY);
 
 
         when(orderConverter.createOrderTempFromOrder(Matchers.refEq(buyOrderToAdd)))
                 .thenReturn(buyOrderTemp);
+
+        when(orderConverter.createOrderFromOrderTemp(Matchers.refEq(buyOrderTemp)))
+                .thenReturn(buyOrderAfterAdd);
 
         when(orderMapper.addOrderTemp(Matchers.refEq(buyOrderTemp)))
                 .thenAnswer(new Answer<Integer>() {
@@ -100,6 +107,8 @@ public class ExecutionServiceWithMockitoTest {
 
         when(orderConverter.createOrderTempFromOrder(Matchers.refEq(sellOrderToAdd)))
                 .thenReturn(sellOrderTemp);
+        when(orderConverter.createOrderFromOrderTemp(Matchers.refEq(sellOrderTemp)))
+                .thenReturn(sellOrderAfterAdd);
 
         when(orderMapper.addOrderTemp(Matchers.refEq(sellOrderTemp)))
                 .thenAnswer(new Answer<Integer>() {
@@ -122,7 +131,7 @@ public class ExecutionServiceWithMockitoTest {
         verify(orderConverter, times(2)).createOrderTempFromOrder(any(Order.class));
 
         verify(orderConverter, never()).createOrderListFromOrderTempList(anyList());
-        verify(orderConverter, never()).createOrderFromOrderTemp(any(OrderTemp.class));
+        verify(orderConverter, times(2)).createOrderFromOrderTemp(any(OrderTemp.class));
         verify(orderMapper, never()).getOrderTemp(anyInt());
         verify(orderMapper, never()).getAllTempOrders();
         verify(orderMapper, never()).updateOrder(any(OrderTemp.class));
@@ -130,8 +139,13 @@ public class ExecutionServiceWithMockitoTest {
 
         Execution execution = new Execution(Optional.empty(), buyOrderId, sellOrderId, EXECUTION_QUANTITY);
         ExecutionTemp executionTemp = new ExecutionTemp(DEFAULT_ID, buyOrderId, sellOrderId, EXECUTION_QUANTITY);
+        Execution executionAfterAdd = new Execution(Optional.of(EXECUTION_ID), buyOrderId, sellOrderId, EXECUTION_QUANTITY);
 
-        when(executionConverter.createExecutionTempFromExecution(Matchers.refEq(execution))).thenReturn(executionTemp);
+        when(executionConverter.createExecutionTempFromExecution(Matchers.refEq(execution))).
+                thenReturn(executionTemp);
+
+        when(executionConverter.createExecutionFromExecutionTemp(Matchers.refEq(executionTemp))).
+                thenReturn(executionAfterAdd);
 
         when(executionMapper.addExecution(Matchers.refEq(executionTemp))).then(new Answer<Integer>() {
             @Override
